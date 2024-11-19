@@ -37,7 +37,7 @@ const router = useRouter(); // 라우터 인스턴스
 const navigateToNextPage = (option) => {
   selectedOption.value = option.name; // 선택된 항목 저장
   console.log(`${option.name} 선택됨`);
-  router.push("/destination"); // 다음 페이지로 이동
+  router.push("/workTime"); // 다음 페이지로 이동
 };
 </script>
 
