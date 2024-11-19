@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import LandingPage from "../views/LandingPage.vue";
 import DestinationSearch from '@/views/DestinationSearch.vue'
 import TransportationSelection from '@/views/TransportationSelection.vue'
+import WorkTimeSelection from '@/views/WorkTimeSelection.vue'
 
 const routes = [
   {
@@ -22,6 +23,10 @@ const routes = [
     path: "/transportations",
     name: "TransportationSelection",
     component: TransportationSelection,
+  },{
+    path: "/workTime",
+    name: "WorkTimeSelection",
+    component: WorkTimeSelection,
   }
 ];
 
