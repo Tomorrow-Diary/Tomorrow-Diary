@@ -5,55 +5,52 @@
       <button
         v-for="(option, index) in options"
         :key="index"
-        :class="['option-button', { selected: selectedOption === option }]"
-        @click="selectOption(option)"
+        :class="['option-button', { selected: selectedOption === option.name }]"
+        @click="navigateToNextPage(option)"
       >
-        <i :class="option.icon"></i> {{ option.name }}
-        <!-- 선택된 버튼에 체크 아이콘 표시 -->
-        <span v-if="selectedOption === option" class="check-icon">✔</span>
+        <div class="button-content">
+          <font-awesome-icon :icon="option.icon" /> <!-- 아이콘 컴포넌트 사용 -->
+          <span>{{ option.name }}</span>
+        </div>
+        <span v-if="selectedOption === option.name" class="check-icon">✔</span>
       </button>
     </div>
-    <button
-      v-if="selectedOption"
-      class="register-button"
-      @click="register"
-    >
-      회원가입
-    </button>
   </div>
 </template>
 
-
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router"; // Vue Router 사용
+
+// Font Awesome 아이콘 가져오기
+import { faCar, faBus, faWalking } from "@fortawesome/free-solid-svg-icons";
 
 const options = [
-  { name: "자가용", icon: "fa fa-car" },
-  { name: "대중교통", icon: "fa fa-bus" },
-  { name: "도보", icon: "fa fa-walking" },
+  { name: "자가용", icon: faCar },
+  { name: "대중교통", icon: faBus },
+  { name: "도보", icon: faWalking },
 ];
 
 const selectedOption = ref(null);
+const router = useRouter(); // 라우터 인스턴스
 
-const selectOption = (option) => {
-  selectedOption.value = option;
-};
-
-const register = () => {
-  alert(`${selectedOption.value.name}을 선택하셨습니다! 회원가입 진행.`);
+const navigateToNextPage = (option) => {
+  selectedOption.value = option.name; // 선택된 항목 저장
+  console.log(`${option.name} 선택됨`);
+  router.push("/destination"); // 다음 페이지로 이동
 };
 </script>
 
 <style scoped>
 .transportation-container {
-  position: fixed; /* 화면에 고정 */
-  top: 50%; /* 화면의 수직 중앙 */
-  left: 50%; /* 화면의 수평 중앙 */
-  transform: translate(-50%, -50%); /* 요소 크기를 고려한 정확한 중앙 정렬 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  align-items: center; /* 수평 가운데 정렬 */
-  justify-content: center; /* 수직 가운데 정렬 */
+  align-items: center;
+  justify-content: center;
   font-family: Arial, sans-serif;
   text-align: center;
   background-color: #fff;
@@ -74,22 +71,27 @@ h1 {
 }
 
 .option-button {
-  width: 100%; /* 버튼이 부모의 너비만큼 차지 */
+  width: 100%;
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #f9f9f9;
   font-size: 1.2rem;
   display: flex;
-  align-items: center; /* 아이콘과 텍스트를 수직 가운데 정렬 */
-  justify-content: center; /* 아이콘과 텍스트를 수평 가운데 정렬 */
-  gap: 0.5rem;
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   transition: background-color 0.3s;
 }
 
 .option-button:hover {
   background-color: #eee;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .option-button.selected {
@@ -98,25 +100,10 @@ h1 {
   border-color: #ff6600;
 }
 
-.register-button {
-  margin-top: 2rem;
-  padding: 1rem 2rem;
+.check-icon {
+  position: absolute;
+  right: 10px;
   font-size: 1.2rem;
-  background-color: #ff6600;
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
-
-.register-button:hover {
-  background-color: #e65c00;
-}
-
-.register-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
 </style>
