@@ -10,12 +10,18 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter(); // 라우터 인스턴스
+
 const kakaoLogin = () => {
   console.log("카카오 로그인 버튼 클릭"); // 카카오 로그인 로직 추가
+  router.push("/destination");
 };
 
 const naverLogin = () => {
   console.log("네이버 로그인 버튼 클릭"); // 네이버 로그인 로직 추가
+  router.push("/destination");
 };
 </script>
 

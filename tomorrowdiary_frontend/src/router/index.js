@@ -4,6 +4,8 @@ import LandingPage from "../views/LandingPage.vue";
 import DestinationSearch from '@/views/DestinationSearch.vue'
 import TransportationSelection from '@/views/TransportationSelection.vue'
 import WorkTimeSelection from '@/views/WorkTimeSelection.vue'
+import Header from '@/views/Header.vue'
+import MainPage from '@/views/MainPage.vue'
 
 const routes = [
   {
@@ -27,6 +29,14 @@ const routes = [
     path: "/workTime",
     name: "WorkTimeSelection",
     component: WorkTimeSelection,
+  },{
+    path: "/header",
+    name: "Header",
+    component: Header,
+  },{
+    path: "/main",
+    name: "MainPage",
+    component: MainPage,
   }
 ];
 

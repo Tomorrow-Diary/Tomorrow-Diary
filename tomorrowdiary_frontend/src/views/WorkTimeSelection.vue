@@ -4,7 +4,7 @@
 
     <!-- 출근 시간 입력 -->
     <div class="time-input">
-      <label>출근 시간:</label>
+      <label>출근 시간</label>
       <div class="time-selection">
         <select v-model="startPeriod" @change="checkInputs">
           <option value="AM">오전</option>
@@ -23,7 +23,7 @@
 
     <!-- 퇴근 시간 입력 -->
     <div class="time-input">
-      <label>퇴근 시간:</label>
+      <label>퇴근 시간</label>
       <div class="time-selection">
         <select v-model="endPeriod" @change="checkInputs">
           <option disabled value="">오전/오후</option>
@@ -85,10 +85,28 @@ const checkInputs = () => {
 
 // 회원가입 버튼 클릭 이벤트
 const register = () => {
-  const startTime = `${startPeriod.value} ${startHour.value}:${startMinute.value.toString().padStart(2, "0")}`;
-  const endTime = `${endPeriod.value} ${endHour.value}:${endMinute.value.toString().padStart(2, "0")}`;
-  alert(`출근 시간: ${startTime}, 퇴근 시간: ${endTime} 회원가입 진행.`);
+  const startTime = createDate(startPeriod.value, startHour.value, startMinute.value);
+  const endTime = createDate(endPeriod.value, endHour.value, endMinute.value);
+
+  alert(`출근 시간: ${startTime.toLocaleString()}, 퇴근 시간: ${endTime.toLocaleString()} 회원가입 진행.`);
 };
+
+// 시간을 Date 객체로 생성하는 함수
+const createDate = (period, hour, minute) => {
+  const now = new Date(); // 현재 날짜
+  let hours = parseInt(hour, 10); // 입력된 시간
+
+  // 오전/오후에 따라 시간 변환
+  if (period === "PM" && hours !== 12) {
+    hours += 12; // 오후면 12시간 추가
+  } else if (period === "AM" && hours === 12) {
+    hours = 0; // 오전 12시는 0으로 설정
+  }
+
+  // 새로운 Date 객체 반환
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, parseInt(minute, 10));
+};
+
 </script>
 
 <style scoped>
