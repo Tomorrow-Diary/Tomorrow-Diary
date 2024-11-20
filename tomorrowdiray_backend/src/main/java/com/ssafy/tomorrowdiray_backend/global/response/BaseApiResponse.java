@@ -5,6 +5,7 @@ import com.ssafy.tomorrowdiray_backend.global.exception.BaseCode;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.ResponseEntity;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,25 +26,31 @@ public class BaseApiResponse<T> {
 		this.data = data;
 	}
 
-	public static <T> BaseApiResponse<T> success(BaseCode code) {
-		return BaseApiResponse.<T>builder()
-			.status(SUCCESS)
-			.message(code.getMessage())
-			.build();
+	public static <T> ResponseEntity<BaseApiResponse<T>> success(BaseCode code) {
+		return ResponseEntity
+				.status(code.getStatus())
+				.body(BaseApiResponse.<T>builder()
+						.status(SUCCESS)
+						.message(code.getMessage())
+						.build());
 	}
 
-	public static <T> BaseApiResponse<T> success(BaseCode code, T data) {
-		return BaseApiResponse.<T>builder()
-			.status(SUCCESS)
-			.message(code.getMessage())
-			.data(data)
-			.build();
+	public static <T> ResponseEntity<BaseApiResponse<T>> success(BaseCode code, T data) {
+		return ResponseEntity
+				.status(code.getStatus())
+				.body(BaseApiResponse.<T>builder()
+						.status(SUCCESS)
+						.message(code.getMessage())
+						.data(data)
+						.build());
 	}
 
-	public static <T> BaseApiResponse<T> fail(BaseCode code) {
-		return BaseApiResponse.<T>builder()
-			.status(FAIL)
-			.message(code.getMessage())
-			.build();
+	public static <T> ResponseEntity<BaseApiResponse<T>> fail(BaseCode code) {
+		return ResponseEntity
+				.status(code.getStatus())
+				.body(BaseApiResponse.<T>builder()
+						.status(FAIL)
+						.message(code.getMessage())
+						.build());
 	}
 }

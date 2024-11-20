@@ -16,8 +16,6 @@ public class GlobalExceptionHandler {
 	protected ResponseEntity<BaseApiResponse<Void>> handleCustomException(ApiException ex) {
 		BaseCode errorCode = ex.getBaseCode();
 		log.warn("ApiException handling: {}", ex.getMessage());
-		return ResponseEntity
-			.status(errorCode.getStatus())
-			.body(BaseApiResponse.fail(errorCode));
+		return BaseApiResponse.fail(errorCode);
 	}
 }
