@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode implements BaseCode{
 
 	// ----- [User] ----- //
-	ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 유저입니다.");
+	ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 유저입니다."), UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "접근할 수 없는 유저입니다.");
 
 	private final HttpStatus status;
 	private final String message;
