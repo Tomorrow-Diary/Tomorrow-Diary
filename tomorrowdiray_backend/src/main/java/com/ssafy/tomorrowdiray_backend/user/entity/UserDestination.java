@@ -17,4 +17,12 @@ public class UserDestination {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    public static UserDestination toEntity(String destinationAddress, double latitude, double longitude) {
+        return UserDestination.builder()
+            .destinationAddress(destinationAddress)
+            .latitude(latitude)
+            .longitude(longitude)
+            .build();
+    }
 }
