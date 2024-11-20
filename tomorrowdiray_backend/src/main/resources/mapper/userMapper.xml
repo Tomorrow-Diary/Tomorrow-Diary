@@ -46,4 +46,8 @@
         )
     </insert>
 
+    <select id="findBySocialUser" resultType="User" parameterType="SocialUser">
+        select * from users where social_id=#{socialId} and nickname=#{nickname}
+    </select>
+
 </mapper>
