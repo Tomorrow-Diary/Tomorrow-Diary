@@ -11,9 +11,8 @@ import com.ssafy.tomorrowdiray_backend.user.service.KakaoLoginService;
 import com.ssafy.tomorrowdiray_backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -28,18 +27,8 @@ public class UserController {
     private final UserService userService;
     private final KakaoLoginService kakaoLoginService;
 
-    @Operation(
-            summary = "회원가입 API",
-            description = "OAuth 로그인 중 우리 서비스 사용자가 아닌 경우 회원가입을 요청합니다."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "회원가입 성공",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = SignupResponse.class)
-            )
-    )
+    @Operation(summary = "회원가입 API", description = "OAuth 로그인 중 우리 서비스 사용자가 아닌 경우 회원가입을 요청합니다.")
+    @ApiResponse(responseCode = "200", description = "회원가입 성공")
     @PostMapping("/sign-up")
     public ResponseEntity<BaseApiResponse<SignupResponse>> signup(
             @Parameter(hidden = true) @SessionAttribute Long socialId,
@@ -49,6 +38,11 @@ public class UserController {
         return BaseApiResponse.success(StatusCode.SIGNUP_SUCCESS, response);
     }
 
+    @Operation(summary = "Kakao 로그인 API", description = "카카오 로그인을 진행합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "로그인 성공"),
+        @ApiResponse(responseCode = "202", description = "회원가입이 필요합니다.")
+    })
     @PostMapping("/kakao-login")
     public ResponseEntity<BaseApiResponse<Object>> kakaoLogin(
         HttpSession session,
