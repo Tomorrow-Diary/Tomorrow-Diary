@@ -9,6 +9,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons"; // Solid 아이콘 패�
 
 import App from './App.vue'
 import router from './router'
+import './assets/css/global.css';
 
 library.add(fas);
 

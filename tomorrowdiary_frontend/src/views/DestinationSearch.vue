@@ -8,7 +8,7 @@
         placeholder="이름으로 검색해주세요"
         @keyup.enter="searchPlaces"
       />
-      <button @click="searchPlaces">🔍</button>
+      <button @click="searchPlaces"><font-awesome-icon icon="magnifying-glass" /></button>
     </div>
     <div v-if="places.length > 0" class="places-list"> <!-- 검색 결과 있을 때만 표시 -->
       <div
