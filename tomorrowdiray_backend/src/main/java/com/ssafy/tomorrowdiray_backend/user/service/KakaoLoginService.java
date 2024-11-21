@@ -44,8 +44,9 @@ public class KakaoLoginService implements LoginService {
 		}
 
 		return SocialUser.builder()
-			.user(user.get())
-			.build();
+				.nickname(socialUser.getNickname())
+				.user(user.get())
+				.build();
 	}
 
 	public String getAccessTokenFromKakao(String code) {
