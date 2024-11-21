@@ -18,9 +18,9 @@ public class HouseService {
     private final HouseRepository houseRepository;
 
     public List<HouseResponse> getHouses(String dongcode) {
-        List<House> houses = houseRepository.selectByDongcode(dongcode);
-        List<HouseResponse> responses = houses.stream().map(HouseResponse::toDto).toList();
-        return responses;
+        return houseRepository.selectByDongcode(dongcode).stream()
+                .map(HouseResponse::toDto)
+                .toList();
     }
 
     public HouseDetailResponse getHouseByAptSeq(String aptSeq) {
