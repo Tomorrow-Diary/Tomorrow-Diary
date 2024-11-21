@@ -15,9 +15,10 @@
     <select id="selectBykeyword" resultMap="addressMap">
         select *
         from dongcodes
-        where sido_name like CONCAT('%', #{keyword}, '%')
-        or gugun_name like CONCAT('%', #{keyword}, '%')
-        or dong_name like CONCAT('%', #{keyword}, '%')
-        or CONCAT(sido_name, ' ', gugun_name, ' ', dong_name) like CONCAT('%', #{keyword}, '%')
+        where dong_name != ''
+        and (sido_name like CONCAT('%', #{keyword}, '%')
+            or gugun_name like CONCAT('%', #{keyword}, '%')
+            or dong_name like CONCAT('%', #{keyword}, '%')
+            or CONCAT(sido_name, ' ', gugun_name, ' ', dong_name) like CONCAT('%', #{keyword}, '%'))
     </select>
 </mapper>
