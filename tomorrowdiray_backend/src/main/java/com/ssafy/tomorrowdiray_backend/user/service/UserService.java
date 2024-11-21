@@ -2,6 +2,7 @@ package com.ssafy.tomorrowdiray_backend.user.service;
 
 import com.ssafy.tomorrowdiray_backend.user.dto.request.SignupRequest;
 import com.ssafy.tomorrowdiray_backend.user.dto.response.SignupResponse;
+import com.ssafy.tomorrowdiray_backend.user.entity.User;
 import com.ssafy.tomorrowdiray_backend.user.entity.UserDestination;
 import com.ssafy.tomorrowdiray_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +19,24 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public SignupResponse signup(Long socialId, String nickname, SignupRequest request) {
+    public User signup(Long socialId, String nickname, SignupRequest request) {
         LocalTime startTime = request.getStartTime();
         LocalTime endTime = request.getEndTime();
         Long transportTypeId = request.getRouteType().getOrder();
 
         UserDestination userDestination = registDestination(request.getRoadAddress(), request.getLatitude(), request.getLongitude());
 
-        userRepository.insert(socialId, nickname, startTime, endTime, transportTypeId, userDestination.getId());
+        User user = User.builder()
+                .socialId(socialId)
+                .nickname(nickname)
+                .startTime(startTime)
+                .endTime(endTime)
+                .transportTypeId(transportTypeId)
+                .usersDestinationId(userDestination.getId())
+                .build();
+        userRepository.insert(user);
 
-        return SignupResponse.toDto(nickname);
+        return user;
     }
 
     @Transactional

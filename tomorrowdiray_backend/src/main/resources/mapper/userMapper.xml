@@ -16,7 +16,7 @@
         <result property="usersDestinationId" column="users_destination_id" />
     </resultMap>
 
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO users (
             social_id,
             nickname,
