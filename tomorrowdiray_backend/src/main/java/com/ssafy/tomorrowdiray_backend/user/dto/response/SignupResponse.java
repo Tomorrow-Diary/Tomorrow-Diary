@@ -1,5 +1,6 @@
 package com.ssafy.tomorrowdiray_backend.user.dto.response;
 
+import com.ssafy.tomorrowdiray_backend.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +15,9 @@ public class SignupResponse {
         this.nickname = nickname;
     }
 
-    public static SignupResponse toDto(String nickname) {
+    public static SignupResponse toDto(User user) {
         return SignupResponse.builder()
-                .nickname(nickname)
+                .nickname(user.getNickname())
                 .build();
     }
 }

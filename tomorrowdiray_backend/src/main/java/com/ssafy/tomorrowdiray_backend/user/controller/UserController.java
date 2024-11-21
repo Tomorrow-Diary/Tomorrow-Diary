@@ -7,6 +7,7 @@ import com.ssafy.tomorrowdiray_backend.user.dto.request.LoginRequest;
 import com.ssafy.tomorrowdiray_backend.user.dto.request.SignupRequest;
 import com.ssafy.tomorrowdiray_backend.user.dto.response.LoginResponse;
 import com.ssafy.tomorrowdiray_backend.user.dto.response.SignupResponse;
+import com.ssafy.tomorrowdiray_backend.user.entity.User;
 import com.ssafy.tomorrowdiray_backend.user.service.KakaoLoginService;
 import com.ssafy.tomorrowdiray_backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,9 +34,15 @@ public class UserController {
     public ResponseEntity<BaseApiResponse<SignupResponse>> signup(
             @Parameter(hidden = true) @SessionAttribute Long socialId,
             @Parameter(hidden = true) @SessionAttribute String nickname,
-            @RequestBody SignupRequest request) {
-        SignupResponse response = userService.signup(socialId, nickname, request);
-        return BaseApiResponse.success(StatusCode.SIGNUP_SUCCESS, response);
+            @RequestBody SignupRequest request,
+            HttpSession session) {
+        User user = userService.signup(socialId, nickname, request);
+
+        session.removeAttribute("socialId");
+        session.removeAttribute("nickname");
+
+        session.setAttribute("user", user);
+        return BaseApiResponse.success(StatusCode.SIGNUP_SUCCESS, SignupResponse.toDto(user));
     }
 
     @Operation(summary = "Kakao 로그인 API", description = "카카오 로그인을 진행합니다.")
@@ -46,7 +53,6 @@ public class UserController {
     @PostMapping("/kakao-login")
     public ResponseEntity<BaseApiResponse<Object>> kakaoLogin(
         HttpSession session,
-        HttpServletResponse response,
         @RequestBody LoginRequest request) {
         SocialUser socialUser = kakaoLoginService.login(request);
 
@@ -60,18 +66,8 @@ public class UserController {
 
         // 로그인 성공 유저
         session.setAttribute("user", socialUser.getUser());
-        Cookie sessionIdCookie = makeCookie("SESSIONID", session.getId()); // 세션 ID 쿠키 생성
-        response.addCookie(sessionIdCookie);
         LoginResponse loginResponse = LoginResponse.toDto(socialUser.getNickname());
         return BaseApiResponse.success(StatusCode.LOGIN_SUCCESS, loginResponse);
-    }
-
-    private Cookie makeCookie(String name, String value) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(60 * 60);
-        return cookie;
     }
 
     @PostMapping("/logout")
@@ -80,7 +76,7 @@ public class UserController {
             HttpServletResponse response) {
         session.invalidate();
 
-        Cookie sessionIdCookie = new Cookie("SESSIONID", null);
+        Cookie sessionIdCookie = new Cookie("JSESSIONID", null);
         sessionIdCookie.setPath("/");
         sessionIdCookie.setHttpOnly(true);
         sessionIdCookie.setMaxAge(0);
