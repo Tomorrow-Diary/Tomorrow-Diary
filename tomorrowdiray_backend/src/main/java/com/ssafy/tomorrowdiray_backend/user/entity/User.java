@@ -11,8 +11,6 @@ import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long id;
@@ -21,6 +19,18 @@ public class User implements Serializable {
 	private LocalTime startTime;
 	private LocalTime endTime;
 	private Role role;
-	private Long transportTypeId;
-	private Long usersDestinationId;
+	private RouteType transportType;
+	private UserDestination userDestination;
+
+	@Builder
+	public User(Long id, Long socialId, String nickname, LocalTime startTime, LocalTime endTime, Role role, RouteType transportType, UserDestination userDestination) {
+		this.id = id;
+		this.socialId = socialId;
+		this.nickname = nickname;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.role = role;
+		this.transportType = transportType;
+		this.userDestination = userDestination;
+	}
 }

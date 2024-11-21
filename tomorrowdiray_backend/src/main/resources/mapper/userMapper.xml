@@ -29,8 +29,8 @@
             #{nickname},
             #{startTime},
             #{endTime},
-            #{transportTypeId},
-            #{usersDestinationId}
+            #{transportType.order},
+            #{userDestination.id}
         )
     </insert>
 
