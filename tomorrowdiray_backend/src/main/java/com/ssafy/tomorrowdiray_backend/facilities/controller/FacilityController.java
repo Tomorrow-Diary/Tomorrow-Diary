@@ -31,6 +31,10 @@ public class FacilityController {
         return BaseApiResponse.success(StatusCode.SHOW_FACILITY_LIST_SUCCESS, responses);
     }
 
+    @Operation(summary = "편의시설 상세 조회 API", description = "편의시설 id로 상세 데이터를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "편의시설 상세 조회 성공")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<BaseApiResponse<FacilityDetailResponse>> getFacility(@PathVariable Long id) {
         FacilityDetailResponse response = facilityService.getFacility(id);
