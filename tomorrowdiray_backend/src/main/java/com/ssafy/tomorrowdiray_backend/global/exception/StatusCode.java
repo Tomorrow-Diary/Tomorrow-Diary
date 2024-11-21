@@ -19,7 +19,8 @@ public enum StatusCode implements BaseCode{
 	SEARCH_ADDRESS_SUCCESS(HttpStatus.OK, "주소 검색 성공" ),
 
 	// ----- [House] ----- //
-	SHOW_HOUSE_SUCCESS(HttpStatus.OK, "아파트 조회 성공"),;
+	SHOW_HOUSE_SUCCESS(HttpStatus.OK, "아파트 상세 조회 성공"),
+	SHOW_HOUSE_LIST_SUCCESS(HttpStatus.OK,"아파트 리스트 조회 성공" );
 
 	private final HttpStatus status;
 	private final String message;

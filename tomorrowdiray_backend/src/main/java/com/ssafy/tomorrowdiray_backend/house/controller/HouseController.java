@@ -2,6 +2,7 @@ package com.ssafy.tomorrowdiray_backend.house.controller;
 
 import com.ssafy.tomorrowdiray_backend.global.exception.StatusCode;
 import com.ssafy.tomorrowdiray_backend.global.response.BaseApiResponse;
+import com.ssafy.tomorrowdiray_backend.house.dto.response.HouseDetailResponse;
 import com.ssafy.tomorrowdiray_backend.house.dto.response.HouseResponse;
 import com.ssafy.tomorrowdiray_backend.house.service.HouseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +27,12 @@ public class HouseController {
     @GetMapping
     public ResponseEntity<BaseApiResponse<List<HouseResponse>>> getHouses(@RequestParam String dongcode) {
         List<HouseResponse> responses = houseService.getHouses(dongcode);
-        return BaseApiResponse.success(StatusCode.SHOW_HOUSE_SUCCESS, responses);
+        return BaseApiResponse.success(StatusCode.SHOW_HOUSE_LIST_SUCCESS, responses);
+    }
+
+    @GetMapping("/{aptSeq}")
+    public ResponseEntity<BaseApiResponse<HouseDetailResponse>> getHouse(@PathVariable String aptSeq) {
+        HouseDetailResponse response = houseService.getHouseByAptSeq(aptSeq);
+        return BaseApiResponse.success(StatusCode.SHOW_HOUSE_SUCCESS, response);
     }
 }
