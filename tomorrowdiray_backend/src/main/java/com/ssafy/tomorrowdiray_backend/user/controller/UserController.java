@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/user")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @RestController
 public class UserController {
@@ -30,7 +30,7 @@ public class UserController {
 
     @Operation(summary = "회원가입 API", description = "OAuth 로그인 중 우리 서비스 사용자가 아닌 경우 회원가입을 요청합니다.")
     @ApiResponse(responseCode = "200", description = "회원가입 성공")
-    @PostMapping("/sign-up")
+    @PostMapping("/signup")
     public ResponseEntity<BaseApiResponse<SignupResponse>> signup(
             @Parameter(hidden = true) @SessionAttribute Long socialId,
             @Parameter(hidden = true) @SessionAttribute String nickname,
@@ -50,7 +50,7 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "로그인 성공"),
         @ApiResponse(responseCode = "202", description = "회원가입이 필요합니다.")
     })
-    @PostMapping("/kakao-login")
+    @PostMapping("/login/kakao")
     public ResponseEntity<BaseApiResponse<Object>> kakaoLogin(
         HttpSession session,
         @RequestBody LoginRequest request) {

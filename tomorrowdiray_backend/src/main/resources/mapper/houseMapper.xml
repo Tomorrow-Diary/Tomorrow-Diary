@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.tomorrowdiray_backend.house.repository.HouseRepository">
+
+    <resultMap id="houseMap" type="com.ssafy.tomorrowdiray_backend.house.entity.House">
+        <id property="aptSeq" column="apt_seq" />
+        <result property="sggCd" column="sgg_cd" />
+        <result property="umdCd" column="umd_cd" />
+        <result property="umdNm" column="umd_nm" />
+        <result property="jibun" column="jibun" />
+        <result property="roadNmSggCd" column="road_nm_sgg_cd" />
+        <result property="roadNm" column="road_nm" />
+        <result property="roadNmBonbun" column="road_nm_bonbun" />
+        <result property="roadNmBubun" column="road_nm_bubun" />
+        <result property="aptNm" column="apt_nm" />
+        <result property="buildYear" column="build_year" />
+        <result property="latitude" column="latitude" />
+        <result property="longitude" column="longitude" />
+    </resultMap>
+
+    <select id="selectByDongcode" resultMap="houseMap">
+        select *
+        from house_infos
+        where concat(sgg_cd, umd_cd) = #{dongcode};
+    </select>
+</mapper>
