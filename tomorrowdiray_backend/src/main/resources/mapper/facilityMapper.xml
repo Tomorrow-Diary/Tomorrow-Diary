@@ -31,4 +31,22 @@
         and f.longitude between #{minLongitude} and #{maxLongitude}
         and FC.name = #{category};
     </select>
+
+    <resultMap id="facilityDetailMap" type="com.ssafy.tomorrowdiray_backend.facilities.dto.response.FacilityDetailResponse">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="category" column="category" />
+        <result property="roadAddress" column="road_address" />
+    </resultMap>
+
+    <select id="selectById" resultMap="facilityDetailMap">
+        select
+            f.id,
+            f.name,
+            fc.name as category,
+            f.road_address
+        from facilities f
+            left join facilities_category fc on f.facilities_category_id = fc.id
+        where f.id=#{id};
+    </select>
 </mapper>

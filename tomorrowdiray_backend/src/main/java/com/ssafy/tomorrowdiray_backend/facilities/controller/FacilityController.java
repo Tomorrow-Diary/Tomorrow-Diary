@@ -1,6 +1,7 @@
 package com.ssafy.tomorrowdiray_backend.facilities.controller;
 
 import com.ssafy.tomorrowdiray_backend.facilities.dto.request.FacilityRequest;
+import com.ssafy.tomorrowdiray_backend.facilities.dto.response.FacilityDetailResponse;
 import com.ssafy.tomorrowdiray_backend.facilities.dto.response.FacilityResponse;
 import com.ssafy.tomorrowdiray_backend.facilities.service.FacilityService;
 import com.ssafy.tomorrowdiray_backend.global.exception.StatusCode;
@@ -10,10 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +29,15 @@ public class FacilityController {
     public ResponseEntity<BaseApiResponse<List<FacilityResponse>>> getFacilities(@ModelAttribute FacilityRequest request) {
         List<FacilityResponse> responses = facilityService.getFacilities(request);
         return BaseApiResponse.success(StatusCode.SHOW_FACILITY_LIST_SUCCESS, responses);
+    }
+
+    @Operation(summary = "편의시설 상세 조회 API", description = "편의시설 id로 상세 데이터를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "편의시설 상세 조회 성공")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseApiResponse<FacilityDetailResponse>> getFacility(@PathVariable Long id) {
+        FacilityDetailResponse response = facilityService.getFacility(id);
+        return BaseApiResponse.success(StatusCode.SHOW_FACILITY_SUCCESS, response);
     }
 }
