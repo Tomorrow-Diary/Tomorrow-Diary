@@ -70,6 +70,10 @@ public class UserController {
         return BaseApiResponse.success(StatusCode.LOGIN_SUCCESS, loginResponse);
     }
 
+    @Operation(summary = "로그아웃 API", description = "로그아웃을 진행합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공")
+    })
     @PostMapping("/logout")
     public ResponseEntity<BaseApiResponse<Void>> logout(
             HttpSession session,
