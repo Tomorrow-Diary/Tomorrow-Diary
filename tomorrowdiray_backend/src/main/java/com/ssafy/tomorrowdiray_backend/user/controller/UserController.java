@@ -73,4 +73,19 @@ public class UserController {
         cookie.setMaxAge(60 * 60);
         return cookie;
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<BaseApiResponse<Void>> logout(
+            HttpSession session,
+            HttpServletResponse response) {
+        session.invalidate();
+
+        Cookie sessionIdCookie = new Cookie("SESSIONID", null);
+        sessionIdCookie.setPath("/");
+        sessionIdCookie.setHttpOnly(true);
+        sessionIdCookie.setMaxAge(0);
+        response.addCookie(sessionIdCookie);
+
+        return BaseApiResponse.success(StatusCode.LOGOUT_SUCCESS);
+    }
 }
