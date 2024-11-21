@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/house")
+@RequestMapping("/api/v1/house")
 @RequiredArgsConstructor
 public class HouseController {
     private final HouseService houseService;
