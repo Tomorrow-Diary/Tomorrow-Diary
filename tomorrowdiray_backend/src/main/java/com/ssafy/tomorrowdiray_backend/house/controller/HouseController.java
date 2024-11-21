@@ -30,6 +30,10 @@ public class HouseController {
         return BaseApiResponse.success(StatusCode.SHOW_HOUSE_LIST_SUCCESS, responses);
     }
 
+    @Operation(summary = "아파트 상세 조회 API", description = "aptSeq으로 아파트 상세 데이터를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "아파트 상세 조회 성공")
+    })
     @GetMapping("/{aptSeq}")
     public ResponseEntity<BaseApiResponse<HouseDetailResponse>> getHouse(@PathVariable String aptSeq) {
         HouseDetailResponse response = houseService.getHouseByAptSeq(aptSeq);
