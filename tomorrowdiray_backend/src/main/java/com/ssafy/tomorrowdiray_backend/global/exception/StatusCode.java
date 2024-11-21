@@ -16,7 +16,10 @@ public enum StatusCode implements BaseCode{
 	LOGOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
 
 	// ----- [Address] ----- //
-	SEARCH_ADDRESS_SUCCESS(HttpStatus.OK, "주소 검색 성공" );
+	SEARCH_ADDRESS_SUCCESS(HttpStatus.OK, "주소 검색 성공" ),
+
+	// ----- [House] ----- //
+	SHOW_HOUSE_SUCCESS(HttpStatus.OK, "아파트 조회 성공"),;
 
 	private final HttpStatus status;
 	private final String message;
