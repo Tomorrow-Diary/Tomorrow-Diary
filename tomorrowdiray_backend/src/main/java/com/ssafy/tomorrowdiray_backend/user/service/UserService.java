@@ -20,20 +20,17 @@ public class UserService {
 
     @Transactional
     public User signup(Long socialId, String nickname, SignupRequest request) {
-        LocalTime startTime = request.getStartTime();
-        LocalTime endTime = request.getEndTime();
-        Long transportTypeId = request.getRouteType().getOrder();
-
         UserDestination userDestination = registDestination(request.getRoadAddress(), request.getLatitude(), request.getLongitude());
 
         User user = User.builder()
                 .socialId(socialId)
                 .nickname(nickname)
-                .startTime(startTime)
-                .endTime(endTime)
-                .transportTypeId(transportTypeId)
-                .usersDestinationId(userDestination.getId())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .transportType(request.getRouteType())
+                .userDestination(userDestination)
                 .build();
+
         userRepository.insert(user);
 
         return user;
