@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.tomorrowdiray_backend.address.repository.AddressRepository">
+    <!-- ResultMap 정의 -->
+    <resultMap id="addressMap" type="com.ssafy.tomorrowdiray_backend.address.entity.Address">
+        <id property="dongCode" column="dong_code" />
+        <result property="sidoName" column="sido_name" />
+        <result property="gugunName" column="gugun_name" />
+        <result property="dongName" column="dong_name" />
+
+    </resultMap>
+
+    <select id="selectBykeyword" resultMap="addressMap">
+        select *
+        from dongcodes
+        where sido_name like CONCAT('%', #{keyword}, '%')
+        or gugun_name like CONCAT('%', #{keyword}, '%')
+        or dong_name like CONCAT('%', #{keyword}, '%')
+        or CONCAT(sido_name, ' ', gugun_name, ' ', dong_name) like CONCAT('%', #{keyword}, '%')
+    </select>
+</mapper>
