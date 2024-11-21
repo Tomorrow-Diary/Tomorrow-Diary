@@ -4,12 +4,12 @@ import com.ssafy.tomorrowdiray_backend.global.exception.StatusCode;
 import com.ssafy.tomorrowdiray_backend.global.response.BaseApiResponse;
 import com.ssafy.tomorrowdiray_backend.house.dto.response.HouseResponse;
 import com.ssafy.tomorrowdiray_backend.house.service.HouseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +19,10 @@ import java.util.List;
 public class HouseController {
     private final HouseService houseService;
 
+    @Operation(summary = "아파트 리스트 조회 API", description = "동코드로 아파트 리스트를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "아파트 조회 성공")
+    })
     @GetMapping
     public ResponseEntity<BaseApiResponse<List<HouseResponse>>> getHouses(@RequestParam String dongcode) {
         List<HouseResponse> responses = houseService.getHouses(dongcode);
