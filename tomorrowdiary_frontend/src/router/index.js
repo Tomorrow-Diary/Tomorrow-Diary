@@ -6,6 +6,7 @@ import TransportationSelection from '@/views/TransportationSelection.vue'
 import WorkTimeSelection from '@/views/WorkTimeSelection.vue'
 import Header from '@/views/Header.vue'
 import MainPage from '@/views/MainPage.vue'
+import HouseSearch from '@/views/HouseSearch.vue'
 
 const routes = [
   {
@@ -30,13 +31,13 @@ const routes = [
     name: "WorkTimeSelection",
     component: WorkTimeSelection,
   },{
-    path: "/header",
-    name: "Header",
-    component: Header,
-  },{
     path: "/main",
     name: "MainPage",
     component: MainPage,
+  },{
+    path: "/map",
+    name: "HouseSearch",
+    component: HouseSearch,
   }
 ];
 
