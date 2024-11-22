@@ -23,7 +23,10 @@ public enum StatusCode implements BaseCode{
 	SHOW_HOUSE_LIST_SUCCESS(HttpStatus.OK,"아파트 리스트 조회 성공" ),
 
 	// ----- [Facility] ----- //
-	SHOW_FACILITY_LIST_SUCCESS(HttpStatus.OK, "편의시설 리스트 조회 성공"),;
+	SHOW_FACILITY_LIST_SUCCESS(HttpStatus.OK, "편의시설 리스트 조회 성공"),
+
+	// ----- [Diary] ----- //
+	CREATE_DIARY_SUCCESS(HttpStatus.OK, "일기 생성 성공");
 
 	private final HttpStatus status;
 	private final String message;
