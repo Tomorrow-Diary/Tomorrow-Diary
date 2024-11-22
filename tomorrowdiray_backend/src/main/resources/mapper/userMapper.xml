@@ -8,12 +8,24 @@
     <resultMap id="userResultMap" type="com.ssafy.tomorrowdiray_backend.user.entity.User">
         <id property="id" column="id" />
         <result property="socialId" column="social_id" />
-        <result property="nickname" column="nickname" />
+        <result property="nickname" column="nickname" javaType="java.lang.String"/>
         <result property="startTime" column="start_time" />
         <result property="endTime" column="end_time" />
-        <result property="role" column="role" />
-        <result property="transportTypeId" column="transport_type_id" />
-        <result property="usersDestinationId" column="users_destination_id" />
+        <result property="role" column="role"/>
+
+        <!-- TransportType 매핑 -->
+        <association property="transportType" javaType="com.ssafy.tomorrowdiray_backend.user.entity.TransportType">
+            <id property="id" column="transport_type_id" />
+            <result property="type" column="transport_type_type" />
+        </association>
+
+        <!-- UserDestination 매핑 -->
+        <association property="userDestination" javaType="com.ssafy.tomorrowdiray_backend.user.entity.UserDestination">
+            <id property="id" column="users_destination_id" />
+            <result property="destinationAddress" column="users_destination_address" />
+            <result property="latitude" column="latitude" />
+            <result property="latitude" column="latitude" />
+        </association>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
@@ -29,7 +41,7 @@
             #{nickname},
             #{startTime},
             #{endTime},
-            #{transportType.order},
+            #{transportType.id},
             #{userDestination.id}
         )
     </insert>
@@ -46,8 +58,23 @@
         )
     </insert>
 
-    <select id="findBySocialUser" resultType="User" parameterType="SocialUser">
-        select * from users where social_id=#{socialId} and nickname=#{nickname}
+    <select id="findBySocialUser" resultMap="userResultMap" parameterType="SocialUser">
+        SELECT
+            u.id,
+            u.social_id,
+            u.nickname,
+            u.start_time,
+            u.end_time,
+            u.role,
+            t.id AS transport_type_id,
+            t.type AS transport_type_type,
+            d.id AS users_destination_id,
+            d.destination_address AS users_destination_address,
+            d.latitude,
+            d.longitude
+        FROM users u
+            LEFT JOIN transport_type t ON u.transport_type_id = t.id
+            LEFT JOIN users_destination d ON u.users_destination_id = d.id
+        WHERE u.social_id = #{socialId} AND u.nickname = #{nickname}
     </select>
-
 </mapper>
