@@ -5,7 +5,7 @@
     </button>
 
     <!-- 사이드바 내용 (활성화 상태에서만 표시) -->
-    <div v-if="isSidebarExpanded" class="sidebar-content">
+    <div v-show="isSidebarExpanded" class="sidebar-content">
       <!-- 편의시설 영역 -->
       <div class="facility-section">
         <div class="facility-header">
@@ -31,7 +31,7 @@
 
       <!-- 검색 박스 -->
       <div class="search-box-wrapper">
-        <KeywordSearchBox @placeSelected="emitPlaceSelected" />
+        <KeywordSearchBox @searchUpdated="$emit('searchUpdated', $event)" @placeSelected="emitPlaceSelected" />
       </div>
     </div>
   </div>
@@ -41,8 +41,7 @@
 import { ref, defineEmits } from "vue";
 import KeywordSearchBox from "../KeywordSearchBox.vue";
 
-// 상위 컴포넌트로 이벤트 전달
-const emit = defineEmits(["placeSelected"]);
+const emit = defineEmits(["placeSelected", "searchUpdated"]);
 
 const isSidebarExpanded = ref(false); // 사이드바 확장 상태
 const selectedFacilities = ref([]); // 선택된 편의시설
@@ -59,11 +58,11 @@ const toggleSidebar = () => {
   isSidebarExpanded.value = !isSidebarExpanded.value;
 };
 
-// 하위 컴포넌트에서 발생한 이벤트를 상위로 전달
 const emitPlaceSelected = (place) => {
   emit("placeSelected", place);
 };
 </script>
+
 
 
 <style scoped>
