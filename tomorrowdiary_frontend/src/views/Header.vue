@@ -35,9 +35,8 @@ const logout = () => {
   top: 0; /* 화면 상단에서 시작 */
   left: 50%; /* 화면의 가운데로 이동 */
   transform: translateX(-50%); /* 정확히 중앙 정렬 */
-  width: 95%; /* 헤더의 전체 너비를 화면의 90%로 설정 */
+  width: 100%; /* 헤더의 전체 너비를 화면의 90%로 설정 */
   height: 60px; /* 고정 높이 */
-  z-index: 1000; /* 다른 요소 위로 배치 */
 }
 
 .header-left h1 {
