@@ -14,11 +14,17 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private final AuthInterceptor authInterceptor;
 
-	// // 구현의 편의를 위해 일단 인터셉터 적용 x
-	// @Override
-	// public void addInterceptors(InterceptorRegistry registry) {
-	// 	registry.addInterceptor(authInterceptor)
-	// 		.addPathPatterns("/**") // 모든 요청 경로에 대해 인터셉터 적용
-	// 		.excludePathPatterns("/static/**", "/login", "/error"); // 제외할 경로 설정;
-	// }
+//	 @Override
+//	 public void addInterceptors(InterceptorRegistry registry) {
+//		 registry.addInterceptor(authInterceptor)
+//				 .addPathPatterns("/**") // 모든 요청 경로에 대해 인터셉터 적용
+//				 .excludePathPatterns(
+//						 "/api/v1/user/login/**",
+//						 "/api/v1/user/signup",
+//						 "/swagger-resources/**",
+//						 "/swagger-ui/**",
+//						 "/v3/api-docs/**",
+//						 "/callback"
+//				 ); // 제외할 경로 설정;
+//	 }
 }

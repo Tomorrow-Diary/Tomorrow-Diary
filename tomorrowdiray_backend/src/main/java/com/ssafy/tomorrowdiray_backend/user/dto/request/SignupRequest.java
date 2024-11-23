@@ -1,6 +1,5 @@
 package com.ssafy.tomorrowdiray_backend.user.dto.request;
 
-import com.ssafy.tomorrowdiray_backend.user.entity.RouteType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +13,7 @@ public class SignupRequest {
     private String roadAddress;
     private double latitude;
     private double longitude;
-    private RouteType routeType;
+    private String transportType;
     @Schema(description = "출근 시간", example = "07:30:00")
     private LocalTime startTime;
 
@@ -22,11 +21,11 @@ public class SignupRequest {
     private LocalTime endTime;
 
     @Builder
-    public SignupRequest(String roadAddress, double latitude, double longitude, String routeType, LocalTime startTime, LocalTime endTime) {
+    public SignupRequest(String roadAddress, double latitude, double longitude, String transportType, LocalTime startTime, LocalTime endTime) {
         this.roadAddress = roadAddress;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.routeType = RouteType.fromString(routeType);
+        this.transportType = transportType;
         this.startTime = startTime;
         this.endTime = endTime;
     }
