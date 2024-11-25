@@ -57,7 +57,9 @@ public class ChatService {
         params.put("enjoy_time", user.getEndTime().plusHours(2));
         // 편의시설 이름
         params.put("first_facility", firstFacility.getName());
-        params.put("second_facility", secondFacility.getName());
+        if(secondFacility != null) {
+            params.put("second_facility", secondFacility.getName());
+        }
         // 이동 수단
         params.put("transport_type", user.getTransportType().getType());
         // 내일 날짜

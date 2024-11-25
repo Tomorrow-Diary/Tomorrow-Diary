@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.ssafy.tomorrowdiray_backend.diary.dto.request.DiaryRequest;
 import com.ssafy.tomorrowdiray_backend.diary.dto.response.CreateContentResponse;
@@ -37,10 +38,12 @@ public class DiaryService {
     @Transactional
     public DiaryResponse createDiary(DiaryRequest request, User user) {
         // 랜덤 시설 정보 가져오기
-        Facility firstFacility = facilityService.getRandomFacility(request.getLatitude(), request.getLongitude(),
-                request.getFacilities().get(0));
-        Facility secondFacility = facilityService.getRandomFacility(request.getLatitude(), request.getLongitude(),
-                request.getFacilities().get(1));
+        List<String> randomFacilities = getRandomFacilities(request.getFacilities());
+        Facility firstFacility = facilityService.getRandomFacility(request.getLatitude(), request.getLongitude(), randomFacilities.get(0));
+        Facility secondFacility = randomFacilities.size() > 1
+                ? facilityService.getRandomFacility(request.getLatitude(), request.getLongitude(), randomFacilities.get(1))
+                : null;
+
         // 날씨 및 날짜 정보 생성
         String weather = Weather.getRandomWeather();
         LocalDate tomorrow = LocalDate.now().plusDays(1);
@@ -65,12 +68,23 @@ public class DiaryService {
         insertDiaryContents(contents, diary, summary);
 
         // DiaryFacility 저장
-        insertDiaryFacilities(List.of(firstFacility, secondFacility), diary);
+        List<Facility> facilities = Stream.of(firstFacility, secondFacility)
+                .filter(Objects::nonNull) // null 제거
+                .toList();
+        insertDiaryFacilities(facilities, diary);
 
         // DiaryImage 저장
         insertDiaryImages(imageUrlList, diary);
 
-        return DiaryResponse.toDto(tomorrow, weather, contents, summary, imageUrlList);
+        return DiaryResponse.toDto(diary, tomorrow, weather, contents, summary, imageUrlList);
+    }
+
+    private List<String> getRandomFacilities(List<String> facilities) {
+        if (facilities.size() <= 2) {
+            return facilities;
+        }
+        Collections.shuffle(facilities);
+        return facilities.subList(0, 2);
     }
 
     private void insertDiaryImages(List<String> imageUrlList, Diary diary) {
