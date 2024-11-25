@@ -104,7 +104,7 @@ const register = () => {
     .then((data) => {
       if (data.status === "success") {
         alert("회원가입 성공!");
-        router.push("/map");
+        router.push("/main");
       } else {
         alert("회원가입 실패: " + data.message);
       }

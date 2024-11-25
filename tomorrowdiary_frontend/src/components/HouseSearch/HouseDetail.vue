@@ -69,7 +69,7 @@ defineProps({
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
   z-index: 1001;
-  padding: 8rem 2rem 2rem; /* 상단 패딩을 4rem으로 변경하여 아래로 이동 */
+  padding: 5rem 2rem 2rem; /* 상단 패딩을 4rem으로 변경하여 아래로 이동 */
   box-sizing: border-box;
 }
 
@@ -82,7 +82,9 @@ defineProps({
 }
 
 .apartment-name {
-  font-size: 1.8rem;
+  padding-left: 1rem;
+  padding-bottom: 1rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #333;
 }

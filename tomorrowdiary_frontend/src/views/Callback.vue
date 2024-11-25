@@ -33,7 +33,7 @@ if (code) {
       if (response.status === 202) {
         router.push('/destination');
       } else if (response.status === 200) {
-        router.push('/map');
+        router.push('/main');
       }
     })
     .catch(error => {
