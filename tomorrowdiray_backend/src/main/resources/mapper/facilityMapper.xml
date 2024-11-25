@@ -49,4 +49,26 @@
             left join facilities_category fc on f.facilities_category_id = fc.id
         where f.id=#{id};
     </select>
+
+    <select id="findByLocationAndCategory" resultMap="facilityMap">
+        <![CDATA[
+            SELECT
+                f.id,
+                f.name,
+                f.road_address,
+                f.longitude,
+                f.latitude,
+                fc.id AS facility_category_id,
+                fc.name AS facility_category_name
+            FROM `Facilities` f
+            JOIN `Facilities_Category` fc
+                ON f.facilities_category_id = fc.id
+            WHERE fc.name = #{category}
+              AND ST_Distance_Sphere(
+                      POINT(f.longitude, f.latitude),
+                      POINT(#{longitude}, #{latitude})
+                  ) <= 1000
+            ]]>
+    </select>
+
 </mapper>

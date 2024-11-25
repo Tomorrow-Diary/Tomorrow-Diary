@@ -14,7 +14,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class HouseService {
-
     private final HouseRepository houseRepository;
 
     public List<HouseResponse> getHouses(String dongcode) {
@@ -25,5 +24,9 @@ public class HouseService {
 
     public HouseDetailResponse getHouseByAptSeq(String aptSeq) {
          return houseRepository.selectByAptSeq(aptSeq);
+    }
+
+    public House getHouseByLocation(Double latitude, Double longitude) {
+        return houseRepository.selectByLocation(latitude, longitude);
     }
 }
