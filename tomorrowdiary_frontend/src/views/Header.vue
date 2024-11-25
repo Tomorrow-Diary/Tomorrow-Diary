@@ -1,16 +1,16 @@
 <template>
   <header class="header">
     <div class="header-left">
-      <h1 class="no-drag">내일일기</h1>
+      <!-- 버튼으로 변경 -->
+      <button class="title-button" @click="navigateToMap">내일일기</button>
     </div>
     <div class="header-right">
       <div class="user-info">
-        <!-- 유저 아이콘을 버튼으로 변경 -->
         <button class="user-icon-button">
           <font-awesome-icon icon="user" class="user-icon" />
         </button>
         <div class="user-details">
-          <span class="user-name">ssafy님</span>
+          <span class="user-name">{{ signupStore.nickname }}님</span> <!-- 닉네임 표시 -->
           <button class="logout-button" @click="logout">로그아웃</button>
         </div>
       </div>
@@ -19,9 +19,35 @@
 </template>
 
 <script setup>
+import { useSignupStore } from "../stores/signup"; // Pinia store
+import axios from "axios";
+import { useRouter, useRoute } from "vue-router"; // useRoute 추가
+
+const signupStore = useSignupStore();
+const router = useRouter();
+const route = useRoute(); // 현재 경로 확인
+
+const navigateToMap = () => {
+  if (route.path === "/map") {
+    window.location.reload(); // 현재 경로가 /map이면 새로고침
+  } else {
+    router.push("/map"); // 아니면 /map으로 이동
+  }
+};
+
 const logout = () => {
-  alert("로그아웃 되었습니다!");
-  // 로그아웃 로직 추가 필요
+  axios
+    .post("/api/v1/user/logout", {}, { withCredentials: true })
+    .then(response => {
+      if (response.data.status === "success") {
+        signupStore.setNickname(""); // 닉네임 초기화
+        alert("로그아웃 되었습니다!");
+        router.push("/");
+      }
+    })
+    .catch(error => {
+      console.error("로그아웃 에러:", error);
+    });
 };
 </script>
 
@@ -39,10 +65,12 @@ const logout = () => {
   height: 60px; /* 고정 높이 */
 }
 
-.header-left h1 {
+.title-button {
+  all: unset; /* 기본 스타일 제거 */
   font-size: 1.5rem;
+  font-weight: bold;
   color: #333;
-  margin: 0;
+  cursor: pointer;
 }
 
 /* 텍스트 드래그 방지 */
