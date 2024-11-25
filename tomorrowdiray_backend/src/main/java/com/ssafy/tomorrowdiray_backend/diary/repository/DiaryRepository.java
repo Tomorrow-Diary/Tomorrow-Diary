@@ -16,4 +16,8 @@ public interface DiaryRepository {
     void insertDiaryFacilities(List<DiaryFacility> diaryFacilities);
 
     void insertDiaryImages(List<DiaryImage> diaryImageList);
+
+    void insertDiaryImage(DiaryImage diaryImage);
+
+    Diary selectByDiaryId(Long diaryId);
 }

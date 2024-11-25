@@ -37,4 +37,12 @@
             (#{content.isRouteImg}, #{content.url}, #{content.diary.id})
         </foreach>
     </insert>
+
+    <insert id="insertDiaryImage" useGeneratedKeys="true" keyProperty="id">
+        insert into Diary_Image(isRouteImg, url, diary_id) values(#{isRouteImg}, #{url}, #{diary.id})
+    </insert>
+
+    <select id="selectByDiaryId" resultMap="diaryMap">
+        select * from diary where id=#{diaryId}
+    </select>
 </mapper>
