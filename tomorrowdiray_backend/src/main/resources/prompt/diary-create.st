@@ -25,7 +25,7 @@
 2. 각 `content`에는 다음을 포함해주세요:
    - 시간(`time`): 활동이 이루어진 시간.
    - 내용(`content`): 한 일, 방문한 장소, 느낀 감정 등을 서술.
-3. 하루를 마무리하며 느낀 감정을 `finalContent`에 간략히 작성해주세요.
+3. 하루를 마무리하며 느낀 감정을 `summary`에 간략히 작성해주세요.
 
 ---
 
@@ -35,23 +35,19 @@
     "contents": [
       <\{
         "time": "$wakeup_time$",
-        "content": "아침에 $wakeup_time$에 일어났다. 날씨가 $tomorrow_weather$라서 기분 좋게 하루를 시작했다.",
-        "imagePrompt": "아침에 $wakeup_time$에 일어나는 장면. 맑고 쾌적한 $tomorrow_weather$ 날씨가 창밖으로 보이며, 따뜻한 침실에서 사람이 기분 좋게 기상하는 모습."
+        "content": "아침에 $wakeup_time$에 일어났다. 날씨가 $tomorrow_weather$라서 기분 좋게 하루를 시작했다."
       \}>,
       <\{
         "time": "$start_time$",
-        "content": "출근 시간에 $transport_type$를 이용해 $destination$으로 이동했다.",
-        "imagePrompt": "$start_time$에 $transport_type$를 이용해 출근하는 장면. 번화한 도로를 지나며, $destination$ 근처의 현대적인 건물이 보이는 상황. 일상적인 출근길의 바쁜 분위기."
+        "content": "출근 시간에 $transport_type$를 이용해 $destination$으로 이동했다."
       \}>,
       <\{
         "time": "$end_time$",
-        "content": "퇴근 후 $first_facility$에 들러서 친구들과 대화를 나눴다.",
-        "imagePrompt": "$end_time$에 퇴근 후 $first_facility$에서 친구들과 대화를 나누는 장면. 따뜻하고 아늑한 카페 내부 분위기."
+        "content": "퇴근 후 $first_facility$에 들러서 친구들과 대화를 나눴다."
       \}>,
       <\{
         "time": "$enjoy_time$",
-        "content": "$second_facility$에 가서 운동을 했다. 하루를 정리하며 만족감을 느꼈다.",
-        "imagePrompt": "저녁 $enjoy_time$에 $second_facility$ 체육관에서 운동하는 장면. 밝게 조명이 켜진 체육관에서 사람이 러닝머신을 뛰거나 웨이트를 드는 모습. 활기차고 에너지 넘치는 분위기."
+        "content": "$second_facility$에 가서 운동을 했다. 하루를 정리하며 만족감을 느꼈다."
       \}>
     ],
     "summary": "오늘 하루는 바쁘지만 보람찼다."
