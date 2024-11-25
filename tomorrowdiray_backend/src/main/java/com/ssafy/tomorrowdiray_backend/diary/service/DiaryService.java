@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
-
     private final ChatService chatService;
     private final DalleService dalleService;
     private final FacilityService facilityService;
@@ -69,14 +68,14 @@ public class DiaryService {
 
         // DiaryFacility 저장
         List<Facility> facilities = Stream.of(firstFacility, secondFacility)
-                .filter(Objects::nonNull) // null 제거
+                .filter(Objects::nonNull)
                 .toList();
         insertDiaryFacilities(facilities, diary);
 
         // DiaryImage 저장
         insertDiaryImages(imageUrlList, diary);
 
-        return DiaryResponse.toDto(diary, tomorrow, weather, contents, summary, imageUrlList);
+        return DiaryResponse.toDto(diary, tomorrow, weather, contents, summary, imageUrlList, facilities, user.getUserDestination());
     }
 
     private List<String> getRandomFacilities(List<String> facilities) {
