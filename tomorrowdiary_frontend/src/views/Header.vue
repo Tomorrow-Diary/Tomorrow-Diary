@@ -28,10 +28,10 @@ const router = useRouter();
 const route = useRoute(); // 현재 경로 확인
 
 const navigateToMap = () => {
-  if (route.path === "/map") {
+  if (route.path === "/main") {
     window.location.reload(); // 현재 경로가 /map이면 새로고침
   } else {
-    router.push("/map"); // 아니면 /map으로 이동
+    router.push("/main"); // 아니면 /map으로 이동
   }
 };
 
