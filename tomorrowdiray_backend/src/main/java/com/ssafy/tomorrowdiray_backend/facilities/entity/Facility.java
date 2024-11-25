@@ -2,6 +2,7 @@ package com.ssafy.tomorrowdiray_backend.facilities.entity;
 
 import lombok.*;
 
+@ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Facility {

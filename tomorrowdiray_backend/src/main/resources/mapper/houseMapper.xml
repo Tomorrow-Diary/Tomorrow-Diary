@@ -66,4 +66,10 @@
         ORDER BY deal_date DESC
         limit 10;
     </select>
+
+    <select id="selectByLocation" resultMap="houseMap">
+        select *
+        from house_infos
+        where latitude=#{latitude} and longitude=#{longitude}
+    </select>
 </mapper>
