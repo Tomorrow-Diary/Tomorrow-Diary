@@ -3,7 +3,9 @@ package com.ssafy.tomorrowdiray_backend.user.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@ToString
 @Getter
 @NoArgsConstructor
 public class UserDestination {

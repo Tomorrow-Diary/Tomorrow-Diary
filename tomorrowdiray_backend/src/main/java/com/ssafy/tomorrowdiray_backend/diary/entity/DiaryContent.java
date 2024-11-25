@@ -11,12 +11,12 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DiaryContent {
     private int id;
-    private LocalTime time;
+    private String time;
     private String content;
     private boolean isFinal;
 
     @Builder
-    public DiaryContent(int id, LocalTime time, String content, boolean isFinal) {
+    public DiaryContent(int id, String time, String content, boolean isFinal) {
         this.id = id;
         this.time = time;
         this.content = content;
