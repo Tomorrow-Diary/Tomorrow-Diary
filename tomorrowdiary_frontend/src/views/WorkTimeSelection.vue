@@ -54,25 +54,24 @@
 
 <script setup>
 import { ref } from "vue";
+import { useSignupStore } from "../stores/signup";
+import { useRouter } from "vue-router";
 
-// 시간 및 분 선택 값
-const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1~12
-const minutes = [0, 15, 30, 45]; // 15분 단위
+const hours = Array.from({ length: 12 }, (_, i) => i + 1);
+const minutes = [0, 15, 30, 45];
 
-// 출근 시간 - 기본 오전 설정
-const startPeriod = ref("AM"); // 기본값: 오전
-const startHour = ref(""); // 1~12
-const startMinute = ref(""); // 0, 15, 30, 45
+const startPeriod = ref("AM");
+const startHour = ref("");
+const startMinute = ref("");
 
-// 퇴근 시간 - 기본 오후 설정
-const endPeriod = ref("PM"); // 기본값: 오후
-const endHour = ref(""); // 1~12
-const endMinute = ref(""); // 0, 15, 30, 45
+const endPeriod = ref("PM");
+const endHour = ref("");
+const endMinute = ref("");
 
-// 회원가입 버튼 표시 여부
 const canRegister = ref(false);
+const signupStore = useSignupStore();
+const router = useRouter();
 
-// 입력값 확인
 const checkInputs = () => {
   canRegister.value =
     startPeriod.value &&
@@ -83,30 +82,48 @@ const checkInputs = () => {
     endMinute.value !== "";
 };
 
-// 회원가입 버튼 클릭 이벤트
 const register = () => {
-  const startTime = createDate(startPeriod.value, startHour.value, startMinute.value);
-  const endTime = createDate(endPeriod.value, endHour.value, endMinute.value);
+  const startTime = formatTime(startPeriod.value, startHour.value, startMinute.value);
+  const endTime = formatTime(endPeriod.value, endHour.value, endMinute.value);
+  signupStore.setWorkTimes(startTime, endTime);
 
-  alert(`출근 시간: ${startTime.toLocaleString()}, 퇴근 시간: ${endTime.toLocaleString()} 회원가입 진행.`);
+  // 회원가입 API 요청
+  fetch("/api/v1/user/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      roadAddress: signupStore.roadAddress,
+      latitude: signupStore.latitude,
+      longitude: signupStore.longitude,
+      transportType: signupStore.transportType,
+      startTime: signupStore.startTime,
+      endTime: signupStore.endTime,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status === "success") {
+        alert("회원가입 성공!");
+        router.push("/map");
+      } else {
+        alert("회원가입 실패: " + data.message);
+      }
+    })
+    .catch((err) => {
+      console.error("회원가입 에러:", err);
+      alert("회원가입 중 문제가 발생했습니다.");
+    });
 };
 
-// 시간을 Date 객체로 생성하는 함수
-const createDate = (period, hour, minute) => {
-  const now = new Date(); // 현재 날짜
-  let hours = parseInt(hour, 10); // 입력된 시간
-
-  // 오전/오후에 따라 시간 변환
+const formatTime = (period, hour, minute) => {
+  let hours = parseInt(hour, 10);
   if (period === "PM" && hours !== 12) {
-    hours += 12; // 오후면 12시간 추가
+    hours += 12;
   } else if (period === "AM" && hours === 12) {
-    hours = 0; // 오전 12시는 0으로 설정
+    hours = 0;
   }
-
-  // 새로운 Date 객체 반환
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, parseInt(minute, 10));
+  return `${String(hours).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`;
 };
-
 </script>
 
 <style scoped>

@@ -1,5 +1,14 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import { useSignupStore } from "./stores/signup";
+
+const signupStore = useSignupStore();
+
+// 앱 초기화 시 LocalStorage에서 닉네임 복원
+const storedNickname = localStorage.getItem("nickname");
+if (storedNickname) {
+  signupStore.setNickname(storedNickname); // Pinia 상태 갱신
+}
 </script>
 
 <template>

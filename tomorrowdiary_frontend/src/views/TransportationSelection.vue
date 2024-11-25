@@ -20,9 +20,8 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router"; // Vue Router 사용
-
-// Font Awesome 아이콘 가져오기
+import { useSignupStore } from "../stores/signup";
+import { useRouter } from "vue-router";
 import { faCar, faBus, faWalking } from "@fortawesome/free-solid-svg-icons";
 
 const options = [
@@ -32,12 +31,13 @@ const options = [
 ];
 
 const selectedOption = ref(null);
-const router = useRouter(); // 라우터 인스턴스
+const signupStore = useSignupStore();
+const router = useRouter();
 
 const navigateToNextPage = (option) => {
-  selectedOption.value = option.name; // 선택된 항목 저장
-  console.log(`${option.name} 선택됨`);
-  router.push("/workTime"); // 다음 페이지로 이동
+  selectedOption.value = option.name;
+  signupStore.setTransportType(option.name);
+  router.push("/workTime");
 };
 </script>
 

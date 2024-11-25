@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <h1>내일일기</h1>
+    <h1>내일일기2</h1>
     <p>간편하게 로그인하고 서비스를 이용하세요!</p>
     <div class="button-container">
       <button class="kakao-login" @click="kakaoLogin">카카오로 로그인하기</button>
@@ -15,8 +15,12 @@ import { useRouter } from 'vue-router'
 const router = useRouter(); // 라우터 인스턴스
 
 const kakaoLogin = () => {
-  console.log("카카오 로그인 버튼 클릭"); // 카카오 로그인 로직 추가
-  router.push("/destination");
+  const clientId = '7c1cbc0f742966cf72cdda5cccdcc7ed'; // 본인의 REST API 키로 교체
+  const redirectUri = 'http://localhost:5174/callback'; // 카카오 개발자 콘솔에 등록한 Redirect URI
+  const authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
+
+  // 사용자를 카카오 인증 URL로 리다이렉트
+  window.location.href = authUrl;
 };
 
 const naverLogin = () => {

@@ -7,13 +7,15 @@
 
 <script setup>
 import KeywordSearch from "../components/KeywordSearchBox.vue";
+import { useSignupStore } from "../stores/signup";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const signupStore = useSignupStore();
 
 const handlePlaceSelected = (place) => {
   console.log(`선택된 장소: ${place.place_name}`);
-  // 다음 페이지로 이동
+  signupStore.setDestination(place.road_address_name || place.address_name, place.y, place.x);
   router.push("/transportations");
 };
 </script>
