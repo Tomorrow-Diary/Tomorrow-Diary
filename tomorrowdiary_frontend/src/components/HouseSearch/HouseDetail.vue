@@ -1,27 +1,18 @@
+<!-- HouseDetail.vue -->
 <template>
   <div class="house-detail">
     <button class="close-button" @click="$emit('close')">✖</button>
+
     <!-- 아파트 이름 -->
-    <div class="header">
-      <h1 class="apartment-name">{{ name }}</h1>
-    </div>
+    <h1 class="apartment-name">{{ name }}</h1>
 
     <!-- 단지 정보 -->
-    <div class="section complex-info">
+    <div class="section">
       <h2 class="section-title">단지 정보</h2>
       <div class="info">
-        <div class="info-item">
-          <span class="label">주소</span>
-          <span class="value">{{ address }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">도로명 주소</span>
-          <span class="value">{{ roadAddress }}</span>
-        </div>
-        <div class="info-item">
-          <span class="label">건축년도</span>
-          <span class="value">{{ constructionYear }}</span>
-        </div>
+        <p><strong>주소:</strong> {{ address }}</p>
+        <p><strong>도로명 주소:</strong> {{ roadAddress }}</p>
+        <p><strong>건축년도:</strong> {{ constructionYear }}</p>
       </div>
     </div>
 
@@ -50,7 +41,9 @@
 
     <!-- 내일일기 생성 버튼 -->
     <div class="create-diary">
-      <button class="create-button">내일일기 생성</button>
+      <button class="create-button" @click="$emit('createDiary')">
+        내일일기 생성
+      </button>
     </div>
   </div>
 </template>

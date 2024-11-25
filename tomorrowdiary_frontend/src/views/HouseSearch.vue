@@ -28,7 +28,11 @@
       :transactions="houseDetail.transactions"
       :constructionYear="houseDetail.constructionYear"
       @close="houseDetailVisible = false"
+      @createDiary="showDiary"
     />
+
+    <!-- Diary 컴포넌트 -->
+    <Diary v-if="diaryVisible" @close="diaryVisible = false" />
   </div>
 </template>
 
@@ -36,11 +40,13 @@
 import Header from "./Header.vue";
 import MapSideBar from "../components/HouseSearch/MapSideBar.vue";
 import HouseDetail from "../components/HouseSearch/HouseDetail.vue";
+import Diary from "../components/HouseSearch/Diary.vue";
 import { ref, onMounted } from "vue";
 
 const currentDong = ref("위치 정보 로딩 중...");
 const isSidebarVisible = ref(true); // 사이드바 표시 상태
 const houseDetailVisible = ref(false); // HouseDetail 표시 상태
+const diaryVisible = ref(false); // Diary 표시 상태
 const searchResults = ref([]); // 검색 결과를 유지
 const houseDetail = ref({
   name: "",
@@ -73,14 +79,14 @@ const initializeMap = () => {
   });
 
   // 마커 클릭 이벤트
-  window.kakao.maps.event.addListener(marker, "click", () => {
+  marker.addListener("click", () => {
     houseDetailVisible.value = true;
   });
 
   updateDongInfo(defaultLocation.getLng(), defaultLocation.getLat());
 
   // 지도 드래그 후 동네 업데이트
-  window.kakao.maps.event.addListener(map, "dragend", () => {
+  map.addListener("dragend", () => {
     const center = map.getCenter();
     updateDongInfo(center.getLng(), center.getLat());
   });
@@ -111,7 +117,7 @@ const moveToPlace = (place) => {
   marker.setMap(map);
 
   // 마커 클릭 시 HouseDetail 정보 설정
-  window.kakao.maps.event.addListener(marker, "click", () => {
+  marker.addListener("click", () => {
     houseDetail.value.name = place.place_name || "아파트 이름 없음";
     houseDetail.value.address = place.address_name || "주소 정보 없음";
     houseDetail.value.roadAddress = place.road_address_name || "도로명 주소 없음";
@@ -122,6 +128,11 @@ const moveToPlace = (place) => {
 // 검색 결과 업데이트 함수
 const updateSearchResults = (results) => {
   searchResults.value = results; // 검색 결과를 부모 컴포넌트에서 유지
+};
+
+// Diary 표시 함수
+const showDiary = () => {
+  diaryVisible.value = true;
 };
 
 onMounted(() => {
