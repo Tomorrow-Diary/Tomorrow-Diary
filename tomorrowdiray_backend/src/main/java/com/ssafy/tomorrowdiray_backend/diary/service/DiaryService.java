@@ -122,4 +122,12 @@ public class DiaryService {
 
         diaryRepository.insertDiaryContents(diaryContentList);
     }
+
+    public void insertRouteImg(DiaryImage diaryImage) {
+        diaryRepository.insertDiaryImage(diaryImage);
+    }
+
+    public Diary selectByDiaryId(Long diaryId) {
+        return diaryRepository.selectByDiaryId(diaryId);
+    }
 }
