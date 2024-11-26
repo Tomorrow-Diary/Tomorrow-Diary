@@ -1,11 +1,5 @@
 package com.ssafy.tomorrowdiray_backend.diary.service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.ssafy.tomorrowdiray_backend.diary.dto.request.DiaryRequest;
 import com.ssafy.tomorrowdiray_backend.diary.dto.response.CreateContentResponse;
 import com.ssafy.tomorrowdiray_backend.diary.dto.response.DiaryResponse;
@@ -17,11 +11,16 @@ import com.ssafy.tomorrowdiray_backend.global.util.JsonUtil;
 import com.ssafy.tomorrowdiray_backend.house.entity.House;
 import com.ssafy.tomorrowdiray_backend.house.service.HouseService;
 import com.ssafy.tomorrowdiray_backend.user.entity.User;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -42,13 +41,18 @@ public class DiaryService {
         Facility secondFacility = randomFacilities.size() > 1
                 ? facilityService.getRandomFacility(request.getLatitude(), request.getLongitude(), randomFacilities.get(1))
                 : null;
+        List<Facility> facilities = Stream.of(firstFacility, secondFacility)
+                .filter(Objects::nonNull)
+                .toList();
 
         // 날씨 및 날짜 정보 생성
         String weather = Weather.getRandomWeather();
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         // 텍스트 응답 생성
-        String createdByChat = chatService.generateDiaryContent(request, user, firstFacility, secondFacility, weather, tomorrow);
+        String createdByChat = chatService.generateDiaryContent(request, user, facilities, weather, tomorrow);
+
+        log.debug(createdByChat);
 
         // String 객체 변환
         Map<String, Object> createByChatToMap = JsonUtil.parseJsonToMap(createdByChat);
@@ -56,7 +60,7 @@ public class DiaryService {
         String summary = (String) createByChatToMap.get("summary");
 
         // 이미지 생성
-        List<String> imageUrlList = dalleService.generateImage(contents, summary);
+        List<String> imageUrlList = dalleService.generateImage(contents);
 
         // 일기 저장
         House house = houseService.getHouseByLocation(request.getLatitude(), request.getLongitude());
@@ -67,9 +71,6 @@ public class DiaryService {
         insertDiaryContents(contents, diary, summary);
 
         // DiaryFacility 저장
-        List<Facility> facilities = Stream.of(firstFacility, secondFacility)
-                .filter(Objects::nonNull)
-                .toList();
         insertDiaryFacilities(facilities, diary);
 
         // DiaryImage 저장
