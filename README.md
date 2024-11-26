@@ -17,42 +17,42 @@
 | `image`     | 이미지 저장           |
 
 ## ERD
-<img src="images/erd.png" width="50%" />
+<img src="images/erd.png" width="70%" />
 
 ## 클래스 다이어그램
-<img src="images/class_diagram.png" width="50%" />
+<img src="images/class_diagram.png" width="70%" />
 
 
 ## 화면 설계서
 ### 랜딩페이지
-<img src="images/랜딩페이지.png" width="50%" />
+<img src="images/랜딩페이지.png" width="70%" />
 
 ### 시작하기
-<img src="images/시작하기.png" width="50%" />
+<img src="images/시작하기.png" width="70%" />
 
 ### 회원가입-목적지
-<img src="images/회원가입-목적지.png" width="50%" />
+<img src="images/회원가입-목적지.png" width="70%" />
 
 ### 회원가입-이동수단
-<img src="images/회원가입-이동수단.png" width="50%" />
+<img src="images/회원가입-이동수단.png" width="70%" />
 
 ### 메인페이지
-<img src="images/메인페이지.png" width="50%" />
+<img src="images/메인페이지.png" width="70%" />
 
 ### 주택 조회 화면 1
-<img src="images/주택%20조회%20화면.png" width="50%" />
+<img src="images/주택%20조회%20화면.png" width="70%" />
 
 ### 주택 조회 화면 2
-<img src="images/주택%20조회%20화면2.png.png" width="50%" />
+<img src="images/주택%20조회%20화면2.png" width="70%" />
 
 ### 주택 상세 조회 화면
-<img src="images/주택%20상세%20조회%20화면.png" width="50%" />
+<img src="images/주택%20상세%20조회%20화면.png" width="70%" />
 
 ### 자주 방문하는 편의시설 선택 화면
-<img src="images/자주 방문하는 편의시설 선택 화면.png" width="50%" />
+<img src="images/자주 방문하는 편의시설 선택 화면.png" width="70%" />
 
 ### 내일일기 조회
-<img src="images/내일일기%20조회.png" width="50%" />
+<img src="images/내일일기%20조회.png" width="70%" />
 
 ### 내일일기 조회 요약
-<img src="images/내일일기%20조회%20요약.png" width="50%" />
+<img src="images/내일일기%20조회%20요약.png" width="70%" />
