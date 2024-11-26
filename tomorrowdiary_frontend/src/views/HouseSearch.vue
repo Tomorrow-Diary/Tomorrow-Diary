@@ -25,11 +25,15 @@
       :transactions="houseDetail.transactions"
       :constructionYear="houseDetail.constructionYear"
       @close="houseDetailVisible = false"
-      @createDiary="showDiary"
+      @createDiary="showDiary(houseDetail)"
     />
-
-    <!-- Diary 컴포넌트 -->
-    <Diary v-if="diaryVisible" @close="diaryVisible = false" />
+    <Diary
+      v-if="diaryVisible"
+      :facilities="selectedFacilities"
+      :latitude="houseDetail.latitude"
+      :longitude="houseDetail.longitude"
+      @close="diaryVisible = false"
+    />
   </div>
 </template>
 
@@ -52,6 +56,8 @@ const houseDetail = ref({
   roadAddress: "",
   constructionYear: "",
   transactions: [],
+  latitude: 0, // 위도
+  longitude: 0, // 경도
 });
 
 const diaryVisible = ref(false);
@@ -147,7 +153,7 @@ const fetchHouseData = async (dongCode) => {
       withCredentials: true,
     });
     if (response.data.status === "success") {
-      const houses = response.data.data;
+      const houses = response.data.data.houseResponseList;
       addHouseMarkers(houses);
     }
   } catch (error) {
@@ -164,10 +170,11 @@ const fetchHouseDetail = async (aptSeq) => {
     if (response.data.status === "success") {
       const data = response.data.data;
       houseDetail.value = {
+        ...houseDetail.value,
         name: data.name,
         address: data.jibunAddress,
         roadAddress: data.roadAddress,
-        constructionYear: data.buildYear,
+        constructionYear: String(data.buildYear),
         transactions: data.houseDealInfoList.map((deal) => ({
           date: deal.dealDate,
           price: `${deal.dealAmount} 만원`,
@@ -190,24 +197,21 @@ const addHouseMarkers = (houses) => {
   houseMarkers = [];
   overlays = [];
 
-  // 위도(lat) 기준으로 하우스 데이터 정렬 (위도가 낮은 것이 먼저)
   const sortedHouses = houses.sort((a, b) => b.latitude - a.latitude);
 
   sortedHouses.forEach((house) => {
     const markerPosition = new window.kakao.maps.LatLng(house.latitude, house.longitude);
 
-    // 마커 생성 (아이콘)
     const marker = new window.kakao.maps.Marker({
       position: markerPosition,
-      map: map.value, // 수정: map.value 사용
+      map: map.value,
       image: new window.kakao.maps.MarkerImage(
-        "/apart.png", // 아파트 아이콘 경로
+        "/apart.png",
         new window.kakao.maps.Size(24, 24),
         { offset: new window.kakao.maps.Point(12, 24) }
       ),
     });
 
-    // 커스텀 오버레이 생성 (말풍선 스타일)
     const overlayContent = document.createElement("div");
     overlayContent.style.position = "relative";
     overlayContent.style.display = "flex";
@@ -226,26 +230,22 @@ const addHouseMarkers = (houses) => {
     bubble.textContent = house.name;
     overlayContent.appendChild(bubble);
 
-    const arrow = document.createElement("div");
-    arrow.style.width = "0";
-    arrow.style.height = "0";
-    arrow.style.borderLeft = "6px solid transparent";
-    arrow.style.borderRight = "6px solid transparent";
-    arrow.style.borderTop = "6px solid white";
-    overlayContent.appendChild(arrow);
-
     const overlay = new window.kakao.maps.CustomOverlay({
       position: markerPosition,
       content: overlayContent,
       yAnchor: 1.7,
-      map: map.value, // 수정: map.value 사용
+      map: map.value,
     });
 
     const handleMarkerClick = () => {
+      houseDetail.value = {
+        ...houseDetail.value,
+        latitude: markerPosition.getLat(), // 마커의 위도
+        longitude: markerPosition.getLng(), // 마커의 경도
+      };
       fetchHouseDetail(house.aptSeq); // 상세 정보 요청
     };
 
-    // 클릭 이벤트 연결
     window.kakao.maps.event.addListener(marker, "click", handleMarkerClick);
     bubble.addEventListener("click", handleMarkerClick);
     overlayContent.addEventListener("click", handleMarkerClick);
@@ -254,7 +254,6 @@ const addHouseMarkers = (houses) => {
     overlays.push(overlay);
   });
 };
-
 
 const fetchAllFacilities = async () => {
   if (!map.value) return;
@@ -335,8 +334,13 @@ const clearFacilityMarkers = () => {
   }
 };
 
-const showDiary = () => {
+const showDiary = (house) => {
   diaryVisible.value = true;
+  houseDetail.value = {
+    ...houseDetail.value,
+    latitude: house.latitude,
+    longitude: house.longitude,
+  };
 };
 
 // 선택된 카테고리 기반 마커 업데이트
