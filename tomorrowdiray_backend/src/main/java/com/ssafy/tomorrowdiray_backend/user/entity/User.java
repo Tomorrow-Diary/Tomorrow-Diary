@@ -5,6 +5,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalTime;
 
+@ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements Serializable {
