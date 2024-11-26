@@ -17,19 +17,17 @@ public class DiaryResponse {
     private String date;
     private String weather;
     private String summary;
-    private String summaryImgUrl;
     private List<CreateContentResponse> contents;
     private List<Facility> facilities;
     private UserDestination userDestination;
 
     @Builder
-    public DiaryResponse(Long id, String date, String weather, List<CreateContentResponse> contents, String summary, String summaryImgUrl, List<Facility> facilities, UserDestination userDestination) {
+    public DiaryResponse(Long id, String date, String weather, List<CreateContentResponse> contents, String summary, List<Facility> facilities, UserDestination userDestination) {
         this.id = id;
         this.date = date;
         this.weather = weather;
         this.contents = contents;
         this.summary = summary;
-        this.summaryImgUrl = summaryImgUrl;
         this.facilities = facilities;
         this.userDestination = userDestination;
     }
@@ -43,7 +41,6 @@ public class DiaryResponse {
                 .weather(weather)
                 .contents(updatedContents)
                 .summary(summary)
-                .summaryImgUrl(imgUrlList.get(imgUrlList.size() - 1))
                 .facilities(facilities)
                 .userDestination(userDestination)
                 .build();
