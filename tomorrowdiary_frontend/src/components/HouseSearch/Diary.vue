@@ -7,7 +7,6 @@
       @mouseup="endDrag"
     >
       <div v-if="!isSummaryPage" class="diary-content">
-        <!-- 왼쪽: 이미지 및 날짜/시간 -->
         <div class="diary-left">
           <img
             class="diary-image"
@@ -19,32 +18,24 @@
           <p class="diary-date">{{ currentDiary.date }} {{ currentDiary.time }}</p>
           <p class="diary-activity">{{ currentDiary.activity }}</p>
         </div>
-
-        <!-- 가운데 선 -->
         <div class="divider"></div>
-
-        <!-- 오른쪽: 제목 및 내용 -->
         <div class="diary-right">
-          <h2 class="diary-title">{{ currentDiary.title }}</h2>
           <p class="diary-text">{{ currentDiary.text }}</p>
         </div>
       </div>
-
       <div v-else class="summary-content">
-        <!-- 요약 페이지 왼쪽 -->
         <div class="summary-left">
-          <img
-            class="summary-image"
-            src="/diaryImage/summaryImage.png"
-            alt="Summary Image"
-            draggable="false"
+          <KakaoMap
+            v-if="summaryRoute"
+            :start="{ lat: props.latitude, lng: props.longitude }"
+            :end="{
+              lat: summaryRoute.destination.lat,
+              lng: summaryRoute.destination.lng,
+            }"
+            :facilities="facilities"
           />
         </div>
-
-        <!-- 가운데 선 -->
         <div class="divider"></div>
-
-        <!-- 요약 페이지 오른쪽 -->
         <div class="summary-right">
           <div
             class="thumbnail-grid"
@@ -64,8 +55,6 @@
           <p class="summary-text">{{ summary.text }}</p>
         </div>
       </div>
-
-      <!-- 화살표 버튼 -->
       <button v-if="currentIndex > 0" class="arrow left-arrow" @click="prevDiary">
         <font-awesome-icon :icon="['fas', 'caret-left']" />
       </button>
@@ -73,57 +62,50 @@
         <font-awesome-icon :icon="['fas', 'caret-right']" />
       </button>
     </div>
-
-    <!-- 이미지 팝업 -->
     <ImageDetail
       v-if="imagePopupVisible"
       :image="selectedImage.image"
       :time="selectedImage.time"
-      :title="selectedImage.title"
       @close="closeImagePopup"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed, defineProps, defineEmits, onMounted } from "vue";
+import axios from "axios";
+import KakaoMap from "./KakaoMap.vue";
 import ImageDetail from "./ImageDetail.vue";
+
+// Props 정의
+const props = defineProps({
+  facilities: Array,
+  latitude: Number,
+  longitude: Number,
+});
 
 const emit = defineEmits(["close"]);
 
-const diaries = ref([
-  {
-    image: "/diaryImage/diary1.png",
-    date: "2024년 11월 15일",
-    time: "07:00 AM",
-    activity: "기상 및 출근준비",
-    title: "새로운 시작, 익숙함 속의 설렘",
-    text: "새벽에 몇 번 깨다 말고...",
-  },
-  {
-    image: "/diaryImage/diary2.png",
-    date: "2024년 11월 15일",
-    time: "08:00 AM",
-    activity: "출근시간",
-    title: "즐거운 출근시간",
-    text: "오늘은 버스로...",
-  },
-]);
+// 데이터 정의
+const diaries = ref([]);
+const summary = ref({
+  date: "",
+  text: "",
+  imgUrl: "",
+});
+const summaryRoute = ref(null);
+const facilities = ref([]); // 편의시설 데이터를 저장
 
-const summary = {
-  date: "2024년 11월 15일",
-  text: "새 자취방에서 설렘 가득한 첫 출근을 마친 하루였다. 🌟",
-};
-
+// 현재 인덱스
 const currentIndex = ref(0);
 const currentDiary = computed(() => diaries.value[currentIndex.value]);
 const isSummaryPage = computed(() => currentIndex.value === diaries.value.length);
 
 const imagePopupVisible = ref(false);
-const selectedImage = ref({ image: "", time: "", title: "" });
+const selectedImage = ref({ image: "", time: "" });
 
 const openImagePopup = (diary) => {
-  selectedImage.value = { image: diary.image, time: diary.time, title: diary.title };
+  selectedImage.value = { image: diary.image, time: diary.time };
   imagePopupVisible.value = true;
 };
 
@@ -142,55 +124,60 @@ const prevDiary = () => {
 };
 
 const nextDiary = () => {
-  // 요약 페이지로 이동 가능
   if (currentIndex.value < diaries.value.length) {
     currentIndex.value++;
   }
 };
 
-// Drag-related functionality
-const dragThreshold = 50; // 드래그로 인식할 최소 거리 (픽셀)
-const isDragging = ref(false);
-const startX = ref(0);
-const currentX = ref(0);
-const hasDragged = ref(false); // 드래그 여부 플래그
+// Diary API 호출
+const createDiary = async () => {
+  try {
+    const response = await axios.post(
+      "/api/v1/diary",
+      {
+        facilities: props.facilities,
+        latitude: props.latitude,
+        longitude: props.longitude,
+      },
+      { withCredentials: true }
+    );
 
-const startDrag = (event) => {
-  // 드래그 시작
-  isDragging.value = true;
-  startX.value = event.clientX;
-  hasDragged.value = false; // 초기화
-};
+    if (response.data.status === "success") {
+      const { data } = response.data;
 
-const onDrag = (event) => {
-  if (isDragging.value) {
-    currentX.value = event.clientX;
+      diaries.value = data.contents.map((content) => ({
+        image: content.imgUrl,
+        date: data.date,
+        time: content.time,
+        activity: "",
+        text: content.content,
+      }));
+      summary.value.date = data.date;
+      summary.value.text = data.summary;
 
-    // 드래그 거리 계산
-    const dragDistance = Math.abs(currentX.value - startX.value);
-    if (dragDistance > dragThreshold) {
-      hasDragged.value = true; // 드래그로 간주
+      // 경로 및 시설 데이터 설정
+      summaryRoute.value = {
+        destination: {
+          lat: data.userDestination.latitude,
+          lng: data.userDestination.longitude,
+        },
+      };
+
+      facilities.value = data.facilities; // 편의시설 데이터 저장
+    } else {
+      console.error("Diary 생성 실패:", response.data.message);
     }
+  } catch (error) {
+    console.error("Diary 생성 중 오류 발생:", error);
   }
 };
 
-const endDrag = (event) => {
-  if (isDragging.value && hasDragged.value) {
-    const dragDistance = startX.value - currentX.value;
-
-    const startArea = startX.value < window.innerWidth / 2 ? "diary-left" : "diary-right";
-    const endArea = currentX.value < window.innerWidth / 2 ? "diary-left" : "diary-right";
-
-    if (startArea === "diary-right" && endArea === "diary-left" && dragDistance > dragThreshold) {
-      nextDiary();
-    } else if (startArea === "diary-left" && endArea === "diary-right" && dragDistance < -dragThreshold) {
-      prevDiary();
-    }
-  }
-  isDragging.value = false;
-};
-
+// Diary 컴포넌트 로드 시 API 호출
+onMounted(() => {
+  createDiary();
+});
 </script>
+
 
 <style scoped>
 .overlay {
@@ -237,7 +224,7 @@ const endDrag = (event) => {
 
 .diary-image {
   width: 90%;
-  height: 75%;
+  height: 85%;
   object-fit: cover;
   border-radius: 10px;
   cursor: pointer;
@@ -264,16 +251,6 @@ const endDrag = (event) => {
   padding: 1rem;
   display: flex;
   flex-direction: column;
-}
-
-.diary-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.summary-date{
-  padding-top: 20px;
 }
 
 .diary-text,
@@ -341,7 +318,7 @@ const endDrag = (event) => {
   width: 2px;
   background-color: #ccc;
   margin: 0 10px;
-  height: 600px;
+  height: 630px;
   align-self: stretch;
 }
 </style>

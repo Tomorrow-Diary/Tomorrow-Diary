@@ -26,14 +26,13 @@ if (code) {
     .then(response => {
       console.log('로그인 응답:', response.data, response.status);
 
-      const nickname = response.data.data.nickname;
-      localStorage.setItem("nickname", nickname); // 닉네임 저장
-      signupStore.setNickname(nickname); // Pinia 상태 갱신
-
       if (response.status === 202) {
         router.push('/destination');
       } else if (response.status === 200) {
         router.push('/main');
+        const nickname = response.data.data.nickname;
+        localStorage.setItem("nickname", nickname); // 닉네임 저장
+        signupStore.setNickname(nickname); // Pinia 상태 갱신
       }
     })
     .catch(error => {
