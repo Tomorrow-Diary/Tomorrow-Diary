@@ -6,6 +6,7 @@
     <MapSideBar
       v-show="isSidebarVisible"
       @facilityToggled="handleFacilityToggled"
+      @placeSelected="moveToPlace"
     />
 
     <!-- 현재 위치 정보 -->
@@ -111,6 +112,18 @@ const setupMapEvents = () => {
     updateDongInfo(center.getLng(), center.getLat());
     updateFacilityMarkers(); // 드래그 후 편의시설 마커 갱신
   });
+};
+
+// 선택된 장소로 지도 이동
+const moveToPlace = (place) => {
+  const { x: lng, y: lat } = place; // place 객체에서 좌표 가져오기
+  const locPosition = new window.kakao.maps.LatLng(lat, lng);
+
+  // 지도의 중심 이동
+  map.value.setCenter(locPosition);
+
+  // 새 위치의 주소 업데이트
+  updateDongInfo(lng, lat);
 };
 
 // 검색 결과 기반 지도 초기화 및 매매 정보 로드

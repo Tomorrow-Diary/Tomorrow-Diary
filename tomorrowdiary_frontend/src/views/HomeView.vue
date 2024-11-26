@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <h1>내일일기2</h1>
+    <h1>내일일기</h1>
     <p>간편하게 로그인하고 서비스를 이용하세요!</p>
     <div class="button-container">
       <button class="kakao-login" @click="kakaoLogin">카카오로 로그인하기</button>

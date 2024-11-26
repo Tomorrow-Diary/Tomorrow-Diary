@@ -131,6 +131,8 @@ defineProps({
   border-collapse: collapse;
 }
 
+
+
 .transactions th,
 .transactions td {
   border: 1px solid #ccc;

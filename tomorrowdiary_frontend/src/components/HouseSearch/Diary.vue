@@ -1,6 +1,11 @@
 <template>
   <div class="overlay" @click.self="closeDiary">
+    <!-- 로딩바 -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
     <div
+      v-show="!isLoading"
       class="diary-container"
       @mousedown="startDrag"
       @mousemove="onDrag"
@@ -15,12 +20,11 @@
             @click="openImagePopup(currentDiary)"
             draggable="false"
           />
-          <p class="diary-date">{{ currentDiary.date }} {{ currentDiary.time }}</p>
+          <p class="diary-date">{{ currentDiary.date }} {{ formattedTime }}</p>
           <p class="diary-activity">{{ currentDiary.activity }}</p>
         </div>
-        <div class="divider"></div>
         <div class="diary-right">
-          <p class="diary-text">{{ currentDiary.text }}</p>
+          <p class="diary-text">{{ formattedText  }}</p>
         </div>
       </div>
       <div v-else class="summary-content">
@@ -39,7 +43,7 @@
         <div class="summary-right">
           <div
             class="thumbnail-grid"
-            :class="{ 'grid-two': diaries.length === 2, 'grid-one': diaries.length === 1 }"
+            :class="{'grid-one': diaries.length === 1 }"
           >
             <img
               v-for="(diary, index) in diaries"
@@ -96,6 +100,8 @@ const summary = ref({
 const summaryRoute = ref(null);
 const facilities = ref([]); // 편의시설 데이터를 저장
 
+const isLoading = ref(false);
+
 // 현재 인덱스
 const currentIndex = ref(0);
 const currentDiary = computed(() => diaries.value[currentIndex.value]);
@@ -131,6 +137,7 @@ const nextDiary = () => {
 
 // Diary API 호출
 const createDiary = async () => {
+  isLoading.value = true; // 로딩 시작
   try {
     const response = await axios.post(
       "/api/v1/diary",
@@ -169,8 +176,21 @@ const createDiary = async () => {
     }
   } catch (error) {
     console.error("Diary 생성 중 오류 발생:", error);
+  } finally {
+    isLoading.value = false; // 로딩 종료
   }
 };
+
+const formattedText = computed(() => {
+  if (!currentDiary.value?.text) return ''; // text가 없는 경우 빈 문자열 반환
+  return currentDiary.value.text.replace(/\./g, '.\n'); // 모든 `.` 뒤에 줄바꿈 추가
+});
+
+const formattedTime = computed(() => {
+  if (!currentDiary.value?.time) return ''; // time 값이 없으면 빈 문자열 반환
+  const [hours, minutes] = currentDiary.value.time.split(':'); // 시간을 ":"로 분리
+  return `${hours}:${minutes}`; // 시간과 분만 반환
+});
 
 // Diary 컴포넌트 로드 시 API 호출
 onMounted(() => {
@@ -212,6 +232,11 @@ onMounted(() => {
   flex: 1;
   padding: 1rem;
   user-select: none;
+
+  background-image: url('/book.PNG'); /* 배경 이미지 경로 */
+  background-size: cover; /* 이미지가 컨테이너에 맞게 조정 */
+  background-position: center; /* 이미지를 가운데 정렬 */
+  background-repeat: no-repeat; /* 이미지 반복 방지 */
 }
 
 .diary-left,
@@ -223,12 +248,13 @@ onMounted(() => {
 }
 
 .diary-image {
-  width: 90%;
+  width: 95%;
   height: 85%;
   object-fit: cover;
   border-radius: 10px;
   cursor: pointer;
   draggable: false;
+  margin-left: 40px;
 }
 
 .summary-image {
@@ -243,49 +269,69 @@ onMounted(() => {
 .diary-activity {
   margin: 0.5rem 0;
   text-align: center;
+  font-family: 'Gyeonggi_Batang_Regular', serif;
 }
 
-.diary-right,
+.diary-right{
+  flex: 1;
+  padding: 1rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding-bottom: 100px;
+  padding-left: 100px;
+}
+
 .summary-right {
   flex: 1;
   padding: 1rem;
+  padding-left: 80px;
   display: flex;
   flex-direction: column;
 }
 
-.diary-text,
+.diary-text{
+  flex: 1;
+  font-size: 1rem;
+  line-height: 5;
+  white-space: pre-wrap; /* 줄바꿈과 공백을 유지 */
+  font-family: 'Gyeonggi_Batang_Regular', serif; /* 커스텀 폰트 적용 */
+}
+
+@font-face {
+  font-family: 'Gyeonggi_Batang_Regular';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2410-3@1.0/Batang_Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
 .summary-text {
   flex: 1;
   font-size: 1rem;
-  line-height: 1.5;
+  vertical-align: middle;
+  font-family: 'Gyeonggi_Batang_Regular', serif;
 }
 
 .thumbnail-grid {
   display: grid;
   gap: 10px;
-  height: 90%;
-  overflow-y: auto;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.thumbnail-grid.grid-two {
   grid-template-columns: repeat(2, 1fr);
-}
-
-.thumbnail-grid.grid-one {
-  grid-template-columns: repeat(1, 1fr);
+  align-items: start; /* 자식 요소 크기에 맞추기 */
+  height: auto; /* 부모 컨테이너 높이를 자식 요소에 맞춤 */
 }
 
 .thumbnail-image {
   width: 100%;
-  height: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 1.3; /* 이미지 비율 유지 */
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   object-fit: cover;
   cursor: pointer;
   draggable: false;
 }
+
 
 .arrow {
   position: absolute;
@@ -314,11 +360,35 @@ onMounted(() => {
   right: 10px;
 }
 
-.divider {
-  width: 2px;
-  background-color: #ccc;
-  margin: 0 10px;
-  height: 630px;
-  align-self: stretch;
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1002;
 }
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  border-top: 5px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 </style>
