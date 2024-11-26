@@ -20,10 +20,33 @@
         <result property="longitude" column="longitude" />
     </resultMap>
 
-    <select id="selectByDongcode" resultMap="houseMap">
-        select *
-        from house_infos
-        where concat(sgg_cd, umd_cd) = #{dongcode};
+    <resultMap id="HouseListResponseMap" type="com.ssafy.tomorrowdiray_backend.house.dto.response.HouseListResponse">
+        <result property="centerLatitude" column="avg_latitude" />
+        <result property="centerLongitude" column="avg_longitude" />
+
+        <collection property="houseResponseList" ofType="com.ssafy.tomorrowdiray_backend.house.dto.response.HouseResponse">
+            <result property="aptSeq" column="apt_seq"/>
+            <result property="name" column="apt_nm"/>
+            <result property="latitude" column="latitude"/>
+            <result property="longitude" column="longitude"/>
+        </collection>
+
+    </resultMap>
+
+    <select id="selectByDongcode" resultMap="HouseListResponseMap">
+        SELECT
+            (SELECT AVG(latitude)
+                FROM house_infos
+                WHERE CONCAT(sgg_cd, umd_cd) = #{dongcode}) AS avg_latitude,
+            (SELECT AVG(longitude)
+                FROM house_infos
+                WHERE CONCAT(sgg_cd, umd_cd) = #{dongcode}) AS avg_longitude,
+            apt_seq,
+            apt_nm,
+            latitude,
+            longitude
+        FROM house_infos
+        WHERE CONCAT(sgg_cd, umd_cd) = #{dongcode};
     </select>
 
     <!-- HouseDetailResponse와 매핑 -->
