@@ -2,31 +2,65 @@
   <div class="map-container">
     <Header :class="{'with-background': true}" />
 
+    <!-- 지도 사이드바 -->
     <MapSideBar
       v-show="isSidebarVisible"
       @facilityToggled="handleFacilityToggled"
     />
 
+    <!-- 현재 위치 정보 -->
     <div class="location-info">
       <h3>{{ currentDong }}</h3>
     </div>
 
+    <!-- 지도 -->
     <div id="map" class="map"></div>
+
+    <!-- HouseDetail 컴포넌트 -->
+    <HouseDetail
+      v-if="houseDetailVisible"
+      :name="houseDetail.name"
+      :address="houseDetail.address"
+      :roadAddress="houseDetail.roadAddress"
+      :transactions="houseDetail.transactions"
+      :constructionYear="houseDetail.constructionYear"
+      @close="houseDetailVisible = false"
+      @createDiary="showDiary"
+    />
+
+    <!-- Diary 컴포넌트 -->
+    <Diary v-if="diaryVisible" @close="diaryVisible = false" />
   </div>
 </template>
 
 <script setup>
 import Header from "./Header.vue";
 import MapSideBar from "../components/HouseSearch/MapSideBar.vue";
+import HouseDetail from "../components/HouseSearch/HouseDetail.vue";
 import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import axios from "axios";
+import Diary from '@/components/HouseSearch/Diary.vue'
 
+const route = useRoute();
 const currentDong = ref("위치 정보 로딩 중...");
 const isSidebarVisible = ref(true);
-const map = ref(null);
-const markers = ref({});
-const selectedFacilities = ref([]);
+const houseDetailVisible = ref(false);
+const houseDetail = ref({
+  name: "",
+  address: "",
+  roadAddress: "",
+  constructionYear: "",
+  transactions: [],
+});
 
+const diaryVisible = ref(false);
+let houseMarkers = []
+let overlays = [];
+let facilityMarkers = ref({});
+const map = ref(null);
+
+const selectedFacilities = ref([]);
 // 아이콘 맵 정의 (Font Awesome 클래스)
 const iconMap = {
   체육시설: "fas fa-dumbbell",
@@ -38,13 +72,13 @@ const iconMap = {
 // 지도 초기화
 const initializeMap = (lat, lng) => {
   const container = document.getElementById("map");
-  const defaultLocation = new window.kakao.maps.LatLng(lat, lng);
+  const defaultLocation = new window.window.kakao.maps.LatLng(lat, lng);
   const options = {
     center: defaultLocation,
     level: 3,
   };
 
-  map.value = new window.kakao.maps.Map(container, options);
+  map.value = new window.window.kakao.maps.Map(container, options);
 
   // 초기 동네 정보 로드
   updateDongInfo(defaultLocation.getLng(), defaultLocation.getLat());
@@ -55,42 +89,187 @@ const initializeMap = (lat, lng) => {
 
 // 동네 정보 업데이트
 const updateDongInfo = (lng, lat) => {
-  const geocoder = new window.kakao.maps.services.Geocoder();
+  const geocoder = new window.window.kakao.maps.services.Geocoder();
   geocoder.coord2Address(lng, lat, (result, status) => {
-    if (status === window.kakao.maps.services.Status.OK) {
-      currentDong.value = result[0]?.address?.region_3depth_name || "주소 정보 없음";
+    if (status === window.window.kakao.maps.services.Status.OK) {
+      const address = result[0]?.address;
+      currentDong.value = address?.region_3depth_name || "주소 정보 없음";
     }
   });
 };
 
 // 지도 이동 및 동네 정보 갱신
 const setupMapEvents = () => {
-  window.kakao.maps.event.addListener(map.value, "dragend", () => {
+  window.window.kakao.maps.event.addListener(map.value, "dragend", () => {
     const center = map.value.getCenter();
     updateDongInfo(center.getLng(), center.getLat());
-    updateFacilityMarkers(); // 지도 이동 시 편의시설 갱신
+    updateFacilityMarkers(); // 드래그 후 편의시설 마커 갱신
   });
 };
 
-// 모든 선택된 편의시설 요청
+// 검색 결과 기반 지도 초기화 및 매매 정보 로드
+const initializeWithSearchResult = async () => {
+  const searchResult = route.query.searchResult;
+
+  if (searchResult) {
+    try {
+      const { sidoName, gugunName, dongName, dongCode } = JSON.parse(searchResult);
+
+      const query = `${sidoName} ${gugunName} ${dongName}`;
+      performAddressSearch(query, (lat, lng) => {
+        initializeMap(lat, lng);
+        fetchHouseData(dongCode);
+      });
+    } catch (error) {
+      console.error("searchResult 파싱 실패:", error);
+    }
+  }
+};
+
+// 주소를 좌표로 변환
+const performAddressSearch = (query, callback) => {
+  const geocoder = new window.window.kakao.maps.services.Geocoder();
+  geocoder.addressSearch(query, (result, status) => {
+    if (status === window.window.kakao.maps.services.Status.OK) {
+      const { y: lat, x: lng } = result[0];
+      callback(parseFloat(lat), parseFloat(lng));
+    } else {
+      console.error("주소 검색 실패");
+    }
+  });
+};
+
+// 동네 매매 정보 요청 및 마커 추가
+const fetchHouseData = async (dongCode) => {
+  try {
+    const response = await axios.get(`/api/v1/house`, {
+      params: { dongcode: dongCode },
+      withCredentials: true,
+    });
+    if (response.data.status === "success") {
+      const houses = response.data.data;
+      addHouseMarkers(houses);
+    }
+  } catch (error) {
+    console.error("아파트 데이터 요청 실패:", error);
+  }
+};
+
+// 아파트 상세 정보 요청
+const fetchHouseDetail = async (aptSeq) => {
+  try {
+    const response = await axios.get(`/api/v1/house/${aptSeq}`, {
+      withCredentials: true,
+    });
+    if (response.data.status === "success") {
+      const data = response.data.data;
+      houseDetail.value = {
+        name: data.name,
+        address: data.jibunAddress,
+        roadAddress: data.roadAddress,
+        constructionYear: data.buildYear,
+        transactions: data.houseDealInfoList.map((deal) => ({
+          date: deal.dealDate,
+          price: `${deal.dealAmount} 만원`,
+          area: `${deal.userArea} m²`,
+          floor: deal.floor,
+        })),
+      };
+      houseDetailVisible.value = true;
+    }
+  } catch (error) {
+    console.error("아파트 상세 정보 요청 실패:", error);
+  }
+};
+
+// 매매 정보 마커 추가 함수
+const addHouseMarkers = (houses) => {
+  // 기존 마커 및 오버레이 제거
+  houseMarkers.forEach((marker) => marker.setMap(null));
+  overlays.forEach((overlay) => overlay.setMap(null));
+  houseMarkers = [];
+  overlays = [];
+
+  // 위도(lat) 기준으로 하우스 데이터 정렬 (위도가 낮은 것이 먼저)
+  const sortedHouses = houses.sort((a, b) => b.latitude - a.latitude);
+
+  sortedHouses.forEach((house) => {
+    const markerPosition = new window.kakao.maps.LatLng(house.latitude, house.longitude);
+
+    // 마커 생성 (아이콘)
+    const marker = new window.kakao.maps.Marker({
+      position: markerPosition,
+      map: map.value, // 수정: map.value 사용
+      image: new window.kakao.maps.MarkerImage(
+        "/apart.png", // 아파트 아이콘 경로
+        new window.kakao.maps.Size(24, 24),
+        { offset: new window.kakao.maps.Point(12, 24) }
+      ),
+    });
+
+    // 커스텀 오버레이 생성 (말풍선 스타일)
+    const overlayContent = document.createElement("div");
+    overlayContent.style.position = "relative";
+    overlayContent.style.display = "flex";
+    overlayContent.style.flexDirection = "column";
+    overlayContent.style.alignItems = "center";
+    overlayContent.style.cursor = "pointer";
+
+    const bubble = document.createElement("div");
+    bubble.style.backgroundColor = "white";
+    bubble.style.padding = "5px 10px";
+    bubble.style.borderRadius = "10px";
+    bubble.style.border = "1px solid #ccc";
+    bubble.style.fontSize = "12px";
+    bubble.style.textAlign = "center";
+    bubble.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    bubble.textContent = house.name;
+    overlayContent.appendChild(bubble);
+
+    const arrow = document.createElement("div");
+    arrow.style.width = "0";
+    arrow.style.height = "0";
+    arrow.style.borderLeft = "6px solid transparent";
+    arrow.style.borderRight = "6px solid transparent";
+    arrow.style.borderTop = "6px solid white";
+    overlayContent.appendChild(arrow);
+
+    const overlay = new window.kakao.maps.CustomOverlay({
+      position: markerPosition,
+      content: overlayContent,
+      yAnchor: 1.7,
+      map: map.value, // 수정: map.value 사용
+    });
+
+    const handleMarkerClick = () => {
+      fetchHouseDetail(house.aptSeq); // 상세 정보 요청
+    };
+
+    // 클릭 이벤트 연결
+    window.kakao.maps.event.addListener(marker, "click", handleMarkerClick);
+    bubble.addEventListener("click", handleMarkerClick);
+    overlayContent.addEventListener("click", handleMarkerClick);
+
+    houseMarkers.push(marker);
+    overlays.push(overlay);
+  });
+};
+
+
 const fetchAllFacilities = async () => {
   if (!map.value) return;
-
   // 기존 마커 제거
-  clearAllMarkers();
-
+  clearFacilityMarkers();
   const bounds = map.value.getBounds();
   const minLatitude = bounds.getSouthWest().getLat();
   const minLongitude = bounds.getSouthWest().getLng();
   const maxLatitude = bounds.getNorthEast().getLat();
   const maxLongitude = bounds.getNorthEast().getLng();
-
   for (const category of selectedFacilities.value) {
     try {
       const response = await axios.get(`/api/v1/facility`, {
         params: { category, minLatitude, minLongitude, maxLatitude, maxLongitude },
       });
-
       if (response.data.status === "success") {
         addFacilityMarkers(category, response.data.data);
       }
@@ -100,15 +279,12 @@ const fetchAllFacilities = async () => {
   }
 };
 
-// 마커 추가
 const addFacilityMarkers = (category, facilities) => {
-  if (!markers.value[category]) {
-    markers.value[category] = [];
+  if (!facilityMarkers.value[category]) {
+    facilityMarkers.value[category] = [];
   }
-
   facilities.forEach((facility) => {
-    const markerPosition = new window.kakao.maps.LatLng(facility.latitude, facility.longitude);
-
+    const markerPosition = new window.window.kakao.maps.LatLng(facility.latitude, facility.longitude);
     // 커스텀 오버레이 생성
     const iconClass = iconMap[category] || "fas fa-map-marker-alt"; // 기본 아이콘
     const overlayContent = document.createElement("div");
@@ -117,13 +293,11 @@ const addFacilityMarkers = (category, facilities) => {
         <i class="${iconClass}" style="font-size: 18px; color: #333;"></i>
       </div>
     `;
-
-    const markerOverlay = new window.kakao.maps.CustomOverlay({
+    const markerOverlay = new window.window.kakao.maps.CustomOverlay({
       position: markerPosition,
       content: overlayContent,
       map: map.value,
     });
-
     const nameOverlayContent = document.createElement("div");
     nameOverlayContent.innerHTML = `
       <div style="background-color: white; padding: 5px 10px; border-radius: 5px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); font-size: 12px; color: #333;">
@@ -131,45 +305,43 @@ const addFacilityMarkers = (category, facilities) => {
       </div>
     `;
     var nameOverlay
-
     overlayContent.addEventListener("mouseenter", () => {
       const mapLevel = map.value.getLevel(); // 현재 지도 레벨 가져오기
       const zoomFactor = 0.0005 * (1.05 ** mapLevel); // 레벨에 따라 배율 조정
-
-      nameOverlay = new window.kakao.maps.CustomOverlay({
-        position: new window.kakao.maps.LatLng(markerPosition.getLat() + zoomFactor, markerPosition.getLng()),
+      nameOverlay = new window.window.kakao.maps.CustomOverlay({
+        position: new window.window.kakao.maps.LatLng(markerPosition.getLat() + zoomFactor, markerPosition.getLng()),
         content: nameOverlayContent,
         map: null, // 초기에는 숨김
       });
-
       nameOverlay.setMap(map.value); // 이름 표시
     });
-
     overlayContent.addEventListener("mouseleave", () => {
       nameOverlay.setMap(null); // 이름 숨김
     });
-
-
-    markers.value[category].push({ markerOverlay, nameOverlay });
+    facilityMarkers.value[category].push({ markerOverlay, nameOverlay });
   });
 };
 
-// 모든 마커 제거
-const clearAllMarkers = () => {
-  for (const category in markers.value) {
-    markers.value[category].forEach(({ markerOverlay, nameOverlay }) => {
+// 마커 제거 함수 수정
+const clearFacilityMarkers = () => {
+  for (const category in facilityMarkers.value) {
+    facilityMarkers.value[category].forEach(({ markerOverlay, nameOverlay }) => {
       markerOverlay.setMap(null);
       if(nameOverlay){
         nameOverlay.setMap(null);
       }
     });
-    markers.value[category] = [];
+    facilityMarkers.value[category] = [];
   }
+};
+
+const showDiary = () => {
+  diaryVisible.value = true;
 };
 
 // 선택된 카테고리 기반 마커 업데이트
 const updateFacilityMarkers = () => {
-  clearAllMarkers();
+  clearFacilityMarkers();
   fetchAllFacilities();
 };
 
@@ -180,12 +352,13 @@ const handleFacilityToggled = (categories) => {
 };
 
 onMounted(() => {
-  initializeMap(37.5665, 126.9780);
+  if (route.query.searchResult) {
+    initializeWithSearchResult();
+  } else {
+    initializeMap(37.5665, 126.9780);
+  }
 });
 </script>
-
-
-
 
 <style scoped>
 .map-container {

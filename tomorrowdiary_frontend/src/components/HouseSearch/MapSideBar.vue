@@ -25,18 +25,27 @@
           </label>
         </div>
       </div>
+      <!-- 검색 박스 -->
+      <div class="search-box-wrapper">
+        <KeywordSearchBox
+          @searchUpdated="emitSearchUpdated"
+          @placeSelected="emitPlaceSelected"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import KeywordSearchBox from '@/components/KeywordSearchBox.vue'
 
-const emit = defineEmits(["facilityToggled"]);
+const emit = defineEmits(["facilityToggled", "placeSelected", "searchUpdated"]);
 
 const isSidebarExpanded = ref(false);
 const selectedFacilities = ref([]);
 
+// 편의시설 목록
 const facilities = [
   { label: "체육시설", value: "체육시설" },
   { label: "음식점", value: "음식점" },
@@ -44,12 +53,24 @@ const facilities = [
   { label: "카페", value: "카페" },
 ];
 
+// 사이드바 확장/축소
 const toggleSidebar = () => {
   isSidebarExpanded.value = !isSidebarExpanded.value;
 };
 
+// 선택된 편의시설 emit
 const toggleFacility = () => {
   emit("facilityToggled", [...selectedFacilities.value]);
+};
+
+// 검색 결과 emit
+const emitSearchUpdated = (searchData) => {
+  emit("searchUpdated", searchData);
+};
+
+// 장소 선택 emit
+const emitPlaceSelected = (place) => {
+  emit("placeSelected", place);
 };
 </script>
 
