@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.tomorrowdiray_backend.diary.repository.DiaryRepository">
+    <!-- ResultMap 정의 -->
+    <resultMap id="diaryMap" type="com.ssafy.tomorrowdiray_backend.diary.entity.Diary">
+        <id property="id" column="id" />
+        <result property="date" column="date" />
+        <result property="weather" column="weather" />
+    </resultMap>
+
+    <insert id="insertDiary" useGeneratedKeys="true" keyProperty="id">
+        insert into diary(date, weather, user_id, house_infos_apt_seq) values(#{date}, #{weather}, #{user.id}, #{house.aptSeq})
+    </insert>
+
+    <insert id="insertDiaryContents" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO Diary_Contents (time, content, isFinal, diary_id)
+        VALUES
+        <foreach collection="list" item="content" separator=",">
+            (#{content.time}, #{content.content}, #{content.isFinal}, #{content.diary.id})
+        </foreach>
+    </insert>
+
+    <insert id="insertDiaryFacilities" useGeneratedKeys="true" keyProperty="id">
+        insert into Diary_Facilities(diary_id, facilities_id)
+        VALUES
+        <foreach collection="list" item="content" separator=",">
+            (#{content.diary.id}, #{content.facility.id})
+        </foreach>
+    </insert>
+
+    <insert id="insertDiaryImages" useGeneratedKeys="true" keyProperty="id">
+        insert into Diary_Image(isRouteImg, url, diary_id)
+        VALUES
+        <foreach collection="list" item="content" separator=",">
+            (#{content.isRouteImg}, #{content.url}, #{content.diary.id})
+        </foreach>
+    </insert>
+
+    <insert id="insertDiaryImage" useGeneratedKeys="true" keyProperty="id">
+        insert into Diary_Image(isRouteImg, url, diary_id) values(#{isRouteImg}, #{url}, #{diary.id})
+    </insert>
+
+    <select id="selectByDiaryId" resultMap="diaryMap">
+        select * from diary where id=#{diaryId}
+    </select>
+</mapper>

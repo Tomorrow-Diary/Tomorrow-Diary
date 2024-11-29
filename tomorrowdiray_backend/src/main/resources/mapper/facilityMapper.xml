@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.tomorrowdiray_backend.facilities.repository.FacilityRepository">
+
+    <resultMap id="facilityMap" type="com.ssafy.tomorrowdiray_backend.facilities.entity.Facility">
+        <!-- Facility 클래스 매핑 -->
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="roadAddress" column="road_address" />
+        <result property="longitude" column="longitude" />
+        <result property="latitude" column="latitude" />
+
+        <!-- FacilityCategory 클래스 매핑 -->
+        <association property="facilityCategory" javaType="com.ssafy.tomorrowdiray_backend.facilities.entity.FacilityCategory">
+            <id property="id" column="facility_category_id" />
+            <result property="name" column="facility_category_name" />
+        </association>
+    </resultMap>
+
+    <select id="selectByCategoryAndCoordinate" resultType="FacilityResponse">
+        select
+            f.id,
+            f.name,
+            f.longitude,
+            f.latitude
+        from facilities f
+            join Facilities_Category FC on FC.id = f.facilities_category_id
+        where f.latitude between #{minLatitude} and #{maxLatitude}
+        and f.longitude between #{minLongitude} and #{maxLongitude}
+        and FC.name = #{category};
+    </select>
+
+    <resultMap id="facilityDetailMap" type="com.ssafy.tomorrowdiray_backend.facilities.dto.response.FacilityDetailResponse">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="category" column="category" />
+        <result property="roadAddress" column="road_address" />
+    </resultMap>
+
+    <select id="selectById" resultMap="facilityDetailMap">
+        select
+            f.id,
+            f.name,
+            fc.name as category,
+            f.road_address
+        from facilities f
+            left join facilities_category fc on f.facilities_category_id = fc.id
+        where f.id=#{id};
+    </select>
+
+    <select id="findByLocationAndCategory" resultMap="facilityMap">
+        <![CDATA[
+            SELECT
+                f.id,
+                f.name,
+                f.road_address,
+                f.longitude,
+                f.latitude,
+                fc.id AS facility_category_id,
+                fc.name AS facility_category_name
+            FROM `Facilities` f
+            JOIN `Facilities_Category` fc
+                ON f.facilities_category_id = fc.id
+            WHERE fc.name = #{category}
+              AND ST_Distance_Sphere(
+                      POINT(f.longitude, f.latitude),
+                      POINT(#{longitude}, #{latitude})
+                  ) <= 1000
+            ]]>
+    </select>
+
+</mapper>
